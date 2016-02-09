@@ -28,4 +28,9 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+    <!-- main activity toolbar style -->
+    <style name="Toolbar" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="popupTheme">@style/Theme.AppCompat.Light</item>
+    </style>
 </resources>
