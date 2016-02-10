@@ -7,6 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- do not put a second back button here - you have one at bottom of screen with nav bar
     <FrameLayout
         android:id="@+id/up_container"
         android:background="@android:color/transparent"
@@ -22,4 +23,5 @@
             android:contentDescription="@string/up"
             android:src="@drawable/ic_arrow_back" />
     </FrameLayout>
+    -->
 </FrameLayout>
