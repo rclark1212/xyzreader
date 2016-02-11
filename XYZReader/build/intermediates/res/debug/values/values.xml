@@ -1628,9 +1628,10 @@
     <style name="ThemeOverlay.AppCompat.Light" parent="Base.ThemeOverlay.AppCompat.Light"/>
     <!-- From: file:/C:/Users/rclark/AndroidStudioProjects/xyzreader/XYZReader/src/main/res/values/styles.xml -->
     <eat-comment/>
-    <style name="Toolbar" parent="Widget.AppCompat.ActionBar">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="popupTheme">@style/Theme.AppCompat.Light</item>
+    <style name="Toolbar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <!-- <item name="android:background">?attr/colorPrimary</item> -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
     <!-- From: file:/C:/Users/rclark/AndroidStudioProjects/xyzreader/XYZReader/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>

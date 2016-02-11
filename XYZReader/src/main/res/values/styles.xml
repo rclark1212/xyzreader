@@ -29,8 +29,8 @@
     </style>
 
     <!-- main activity toolbar style -->
-    <style name="Toolbar" parent="Widget.AppCompat.ActionBar">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="popupTheme">@style/Theme.AppCompat.Light</item>
+    <style name="Toolbar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
 </resources>
