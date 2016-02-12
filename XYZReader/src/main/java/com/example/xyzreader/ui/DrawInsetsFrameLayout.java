@@ -28,6 +28,7 @@ import android.widget.FrameLayout;
 
 import com.example.xyzreader.R;
 
+//TODO - remove this class.
 
 public class DrawInsetsFrameLayout extends FrameLayout {
     private Drawable mInsetBackground;

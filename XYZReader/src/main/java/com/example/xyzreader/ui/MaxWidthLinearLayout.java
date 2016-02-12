@@ -21,6 +21,8 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
+//TODO - eliminate this class.
+
 /**
  * A simple {@link LinearLayout} subclass that has a maxWidth
  */

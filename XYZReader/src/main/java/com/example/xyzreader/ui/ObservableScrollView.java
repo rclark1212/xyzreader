@@ -22,6 +22,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ScrollView;
 
+//TODO - eliminate this class.
+
 /**
  * A custom ScrollView that can accept a scroll listener.
  */
