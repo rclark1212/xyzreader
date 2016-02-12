@@ -7,6 +7,8 @@
     <string name="action_settings">Settings</string>
     <string name="action_share">Share</string>
 
+    <string name="story_photo">Photo of story</string>
+
     <string name="up">Up</string>
 
 </resources>

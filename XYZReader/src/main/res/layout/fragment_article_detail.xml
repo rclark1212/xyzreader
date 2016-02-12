@@ -19,8 +19,8 @@
                 android:background="#333"
                 android:layout_gravity="bottom"
                 android:orientation="vertical"
-                android:paddingLeft="@dimen/detail_inner_horiz_margin"
-                android:paddingRight="@dimen/detail_inner_horiz_margin"
+                android:paddingStart="@dimen/detail_inner_horiz_margin"
+                android:paddingEnd="@dimen/detail_inner_horiz_margin"
                 android:paddingTop="@dimen/detail_metabar_vert_padding"
                 android:paddingBottom="@dimen/detail_metabar_vert_padding"
                 android:layout_marginBottom="@dimen/detail_metabar_vert_padding">
@@ -31,11 +31,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/detail_metabar_title_bottom_padding"
-                    android:fontFamily="sans-serif-condensed"
                     android:textColor="#fff"
                     android:textStyle="bold"
                     android:textSize="@dimen/detail_title_text_size"
                     android:lineSpacingMultiplier="0.9" />
+                    <!-- don't change font family android:fontFamily="sans-serif-condensed" -->
 
                 <TextView
                     android:id="@+id/article_byline"
@@ -50,11 +50,12 @@
                 style="?android:attr/textAppearanceMedium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/detail_inner_horiz_margin"
-                android:layout_marginRight="@dimen/detail_inner_horiz_margin"
+                android:layout_marginStart="@dimen/detail_inner_horiz_margin"
+                android:layout_marginEnd="@dimen/detail_inner_horiz_margin"
                 android:paddingBottom="@dimen/detail_body_bottom_margin"
                 android:textColorLink="@color/theme_accent"
                 android:textSize="@dimen/detail_body_text_size"
+                android:autoLink="web"
                 android:lineSpacingMultiplier="@fraction/detail_body_line_spacing_multiplier" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
@@ -76,7 +77,8 @@
             <ImageView
                 android:id="@+id/photo"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/detail_photo_height" />
+                android:layout_height="@dimen/detail_photo_height"
+                android:contentDescription="@string/story_photo" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
