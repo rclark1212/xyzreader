@@ -14,9 +14,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:collapsedTitleTextAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse"
-            app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse"
-            app:expandedTitleMarginStart="72dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
@@ -26,6 +23,7 @@
                 android:src="@drawable/logo"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
+                android:layout_marginStart="@dimen/toolbar_icon_start_margin"
                 android:contentDescription="@string/app_name" />
 
             <android.support.v7.widget.Toolbar
@@ -55,7 +53,7 @@
             android:scrollbarStyle="outsideOverlay"
             android:paddingLeft="@dimen/list_side_margin"
             android:paddingRight="@dimen/list_side_margin"
-            android:paddingBottom="28dp" />
+            android:paddingBottom="@dimen/recycler_view_bottom_padding" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
 

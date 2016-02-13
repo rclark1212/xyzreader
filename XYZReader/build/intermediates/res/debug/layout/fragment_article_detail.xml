@@ -35,7 +35,7 @@
                     android:textStyle="bold"
                     android:textSize="@dimen/detail_title_text_size"
                     android:lineSpacingMultiplier="0.9" />
-                    <!-- don't change font family android:fontFamily="sans-serif-condensed" -->
+                    <!-- don't change font family - delete android:fontFamily="sans-serif-condensed" -->
 
                 <TextView
                     android:id="@+id/article_byline"
@@ -69,15 +69,14 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/detail_photo_height"
             android:fitsSystemWindows="true"
-            app:collapsedTitleTextAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse"
-            app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse"
-            app:expandedTitleMarginStart="72dp"
+            app:layout_collapseMode="parallax"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
                 android:id="@+id/photo"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/detail_photo_height"
+                android:layout_gravity="center"
                 android:contentDescription="@string/story_photo" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -85,8 +84,8 @@
 
     <android.support.design.widget.FloatingActionButton
         app:fabSize="normal"
-        app:elevation="6dp"
-        app:pressedTranslationZ="12dp"
+        app:elevation="@dimen/fab_elevation"
+        app:pressedTranslationZ="@dimen/fab_press_translation_z"
         android:id="@+id/share_fab"
         android:layout_gravity="bottom|end"
         android:src="@drawable/ic_share"

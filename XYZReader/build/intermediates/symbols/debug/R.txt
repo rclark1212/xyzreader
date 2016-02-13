@@ -515,6 +515,8 @@ int dimen list_toolbar_side_margin 0x7f080076
 int dimen notification_large_icon_height 0x7f080077
 int dimen notification_large_icon_width 0x7f080078
 int dimen notification_subtext_size 0x7f080079
+int dimen recycler_view_bottom_padding 0x7f08007a
+int dimen toolbar_icon_start_margin 0x7f08007b
 int drawable abc_ab_share_pack_mtrl_alpha 0x7f020000
 int drawable abc_action_bar_item_background_material 0x7f020001
 int drawable abc_btn_borderless_material 0x7f020002

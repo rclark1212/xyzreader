@@ -2251,6 +2251,8 @@ containing a value of this type.
         public static final int notification_large_icon_height=0x7f080077;
         public static final int notification_large_icon_width=0x7f080078;
         public static final int notification_subtext_size=0x7f080079;
+        public static final int recycler_view_bottom_padding=0x7f08007a;
+        public static final int toolbar_icon_start_margin=0x7f08007b;
     }
     public static final class drawable {
         public static final int abc_ab_share_pack_mtrl_alpha=0x7f020000;
