@@ -3,6 +3,8 @@ package com.example.xyzreader.ui;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
+import android.app.SharedElementCallback;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
@@ -15,10 +17,14 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
+import android.widget.ImageView;
 
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * An activity representing a single Article detail screen, letting you swipe between articles.
@@ -33,6 +39,28 @@ public class ArticleDetailActivity extends ActionBarActivity
 
     private ViewPager mPager;
     private MyPagerAdapter mPagerAdapter;
+    private boolean mIsReturning = false;
+    private ArticleDetailFragment mCurrentStoryFragment = null;
+
+    private final SharedElementCallback mCallback = new SharedElementCallback() {
+        @Override
+        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+            if (mIsReturning) {
+                ImageView sharedElement = mCurrentStoryFragment.getStoryImage();
+                if (sharedElement == null) {
+                    // If shared element is null, then it has been scrolled off screen and
+                    // no longer visible. In this case we cancel the shared element transition by
+                    // removing the shared element from the shared elements map.
+                    names.clear();
+                    sharedElements.clear();
+                } else {
+                    //TODO
+                    //Check if user swiped to a different pager page. Need to remove old shared element
+                    //and replace it with new to use for transition
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +72,10 @@ public class ArticleDetailActivity extends ActionBarActivity
         }
         setContentView(R.layout.activity_article_detail);
 
+        //Postpone transition until ready and set up callback
+        postponeEnterTransition();
+        setEnterSharedElementCallback(mCallback);
+
         getLoaderManager().initLoader(0, null, this);
 
         mPagerAdapter = new MyPagerAdapter(getFragmentManager());
@@ -54,7 +86,8 @@ public class ArticleDetailActivity extends ActionBarActivity
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
         //add nice transition approach - use the zoomout method in android dev docs
-        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        //TODO - disable for now as we try and get main->detail transitions working
+        //mPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -68,6 +101,7 @@ public class ArticleDetailActivity extends ActionBarActivity
                     mCursor.moveToPosition(position);
                 }
                 mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
+                //TODO - fix up for transitions
             }
         });
 
@@ -77,6 +111,14 @@ public class ArticleDetailActivity extends ActionBarActivity
                 mSelectedItemId = mStartId;
             }
         }
+    }
+
+    @Override
+    public void finishAfterTransition() {
+        mIsReturning = true;
+        //Return data to mainactivity here (i.e. return back data allowing transition to be properly
+        //set up to the right element)
+        super.finishAfterTransition();
     }
 
     @Override
@@ -163,6 +205,7 @@ public class ArticleDetailActivity extends ActionBarActivity
         @Override
         public void setPrimaryItem(ViewGroup container, int position, Object object) {
             super.setPrimaryItem(container, position, object);
+            mCurrentStoryFragment = (ArticleDetailFragment) object;
         }
 
         @Override

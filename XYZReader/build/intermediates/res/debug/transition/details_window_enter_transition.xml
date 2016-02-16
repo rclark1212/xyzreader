@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+    android:transitionOrdering="together"
+    android:duration="1500">
+    <changeImageTransform/>
+    <!--
+    <fade xmlns:android="http://schemas.android.com/apk/res/android">
+        <targets>
+            <target android:excludeId="@android:id/statusBarBackground"/>
+            <target android:excludeId="@android:id/navigationBarBackground"/>
+        </targets>
+    </fade> -->
+</transitionSet><!-- From: file:/C:/Users/rclark/AndroidStudioProjects/xyzreader/XYZReader/src/main/res/transition/details_window_enter_transition.xml -->

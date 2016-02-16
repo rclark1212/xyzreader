@@ -12,16 +12,19 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
+import android.transition.Transition;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -46,6 +49,7 @@ public class ArticleDetailFragment extends Fragment implements
     private View mRootView;
     private ImageView mPhotoView;
     private int mMutedColor = 0;
+    private boolean mIsTransitioning = false;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -69,6 +73,8 @@ public class ArticleDetailFragment extends Fragment implements
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mItemId = getArguments().getLong(ARG_ITEM_ID);
         }
+
+        mIsTransitioning = (savedInstanceState == null);
 
         setHasOptionsMenu(true);
     }
@@ -107,9 +113,35 @@ public class ArticleDetailFragment extends Fragment implements
         });
 
         bindViews();
+
+        if (mIsTransitioning) {
+            //TODO
+        }
+
+        //set transition name
+        mPhotoView.setTransitionName("test_transition");
+
         return mRootView;
     }
 
+    //Do transition here
+    private void startPostponedEnterTransition() {
+        //Check if this is a page view change first...
+        //TODO
+        mPhotoView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mPhotoView.getViewTreeObserver().removeOnPreDrawListener(this);
+                getActivity().startPostponedEnterTransition();
+                return true;
+            }
+        });
+    }
+
+    @Nullable
+    ImageView getStoryImage() {
+        return mPhotoView;
+    }
 
     private void bindViews() {
         if (mRootView == null) {
@@ -142,12 +174,14 @@ public class ArticleDetailFragment extends Fragment implements
                         public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
                             Bitmap bitmap = imageContainer.getBitmap();
                             if (bitmap != null) {
+                                //Start transition once bitmap is loaded
                                 Palette p = Palette.generate(bitmap, 12);
                                 //default to dark theme color if no good color from palette
                                 mMutedColor = p.getDarkVibrantColor( ContextCompat.getColor(getActivity(), R.color.theme_primary_dark) );
                                 mPhotoView.setImageBitmap(imageContainer.getBitmap());
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
+                                startPostponedEnterTransition();
                             }
                         }
 
