@@ -33,9 +33,9 @@ public class ArticleDetailActivity extends ActionBarActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private Cursor mCursor;
-    private long mStartId;
+    private long mStartId;              //indicates starting story
 
-    private long mSelectedItemId;
+    private long mSelectedItemId;       //indicates current story
 
     private ViewPager mPager;
     private MyPagerAdapter mPagerAdapter;
@@ -53,14 +53,18 @@ public class ArticleDetailActivity extends ActionBarActivity
                     // removing the shared element from the shared elements map.
                     names.clear();
                     sharedElements.clear();
-                } else {
-                    //TODO
+                } else if (mStartId != mSelectedItemId) {
                     //Check if user swiped to a different pager page. Need to remove old shared element
                     //and replace it with new to use for transition
+                    names.clear();
+                    names.add(sharedElement.getTransitionName());
+                    sharedElements.clear();
+                    sharedElements.put(sharedElement.getTransitionName(), sharedElement);
                 }
             }
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,6 +122,11 @@ public class ArticleDetailActivity extends ActionBarActivity
         mIsReturning = true;
         //Return data to mainactivity here (i.e. return back data allowing transition to be properly
         //set up to the right element)
+        Intent data = new Intent();
+        data.putExtra(ArticleListActivity.EXTRA_STARTING_STORY_ID, mStartId);
+        data.putExtra(ArticleListActivity.EXTRA_CURRENT_STORY_ID, mSelectedItemId);
+        setResult(RESULT_OK, data);
+
         super.finishAfterTransition();
     }
 
@@ -134,7 +143,7 @@ public class ArticleDetailActivity extends ActionBarActivity
         // Select the start ID
         if (mStartId > 0) {
             mCursor.moveToFirst();
-            // TODO: optimize
+            // TODO: optimize - could do a query instead...
             while (!mCursor.isAfterLast()) {
                 if (mCursor.getLong(ArticleLoader.Query._ID) == mStartId) {
                     final int position = mCursor.getPosition();

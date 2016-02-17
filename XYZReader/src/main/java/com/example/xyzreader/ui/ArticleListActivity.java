@@ -11,6 +11,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.RecyclerView;
@@ -42,15 +43,19 @@ import java.util.Map;
 public class ArticleListActivity extends ActionBarActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private Toolbar mToolbar;
+    private AppBarLayout mToolbar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private Bundle mReenterStateBundle = null;
     private boolean mIsDetailsActivityStarted = false;
     private boolean mIsRefreshing = false;
+    private Adapter mAdapter;
+
+    static final String EXTRA_STARTING_STORY_ID = "extra_starting_story_id";
+    static final String EXTRA_CURRENT_STORY_ID = "extra_current_story_id";
 
     /*
-        Code referenced from Alex Lockwood's excellent activity-transitions sample on github
+        Transition code based on Alex Lockwood's excellent activity-transitions sample on github
      */
 
     //Set a callback for shared element transition
@@ -59,7 +64,22 @@ public class ArticleListActivity extends ActionBarActivity implements
         public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
             if (mReenterStateBundle != null) {
                 //Check here if we are coming back to a different story than when we started. And fix up.
-                //TODO
+                long startingId = mReenterStateBundle.getLong(EXTRA_STARTING_STORY_ID);
+                long currentId = mReenterStateBundle.getLong(EXTRA_CURRENT_STORY_ID);
+                if (startingId != currentId) {
+                    // If startingPosition != currentPosition the user must have swiped to a
+                    // different page in the DetailsActivity. We must update the shared element
+                    // so that the correct one falls into place.
+                    String newTransitionName = "xyztrans" + currentId;
+                    View newSharedElement = mRecyclerView.findViewWithTag(currentId);
+                    if (newSharedElement != null) {
+                        names.clear();
+                        names.add(newTransitionName);
+                        sharedElements.clear();
+                        sharedElements.put(newTransitionName, newSharedElement);
+                    }
+                }
+
                 mReenterStateBundle = null;
             } else {
                 // If mReenterStateBundle is null, then the activity is exiting.
@@ -85,7 +105,8 @@ public class ArticleListActivity extends ActionBarActivity implements
         //Set a shared element callback for the case where we may be exiting to a different element than we start from
         setExitSharedElementCallback(mCallback);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        //Change toolbar global to the app bar (used later)
+        mToolbar = (AppBarLayout) findViewById(R.id.app_bar_layout);
 
 
         //unused view (and move to coordinatorlayout)
@@ -137,13 +158,19 @@ public class ArticleListActivity extends ActionBarActivity implements
     public void onActivityReenter(int requestCode, Intent data) {
         super.onActivityReenter(requestCode, data);
         //Get bundle from detail activity (pass back parameters on what the currently selected story might be) - TODO
-        //mReenterStateBundle = new Bundle(data.getExtras());
+        mReenterStateBundle = new Bundle(data.getExtras());
+        long startingId = mReenterStateBundle.getLong(EXTRA_STARTING_STORY_ID);
+        long currentId = mReenterStateBundle.getLong(EXTRA_CURRENT_STORY_ID);
+        if (startingId != currentId) {
+            //scroll to currentId - note, convert the ID to position...
+            int position = mAdapter.findItemId(currentId);
+            //if you are on the first row, need to collapse title bar (app bar hides return image)
+            if (position < 2) {     //TODO - fix this magic number (first row or not?)
+                mToolbar.setExpanded(false);
+            }
+            mRecyclerView.scrollToPosition(mAdapter.findItemId(currentId));
 
-        //TODO
-        //If the story being viewed changed, scroll to the new position
-        //if (startingPosition != currentPosition) {
-        //    mRecyclerView.scrollToPosition(currentPosition);
-        //}
+        }
 
         //Hold off on any animation until we are ready to redraw view. Looks like a bug that Alex Lockwood worked around
         postponeEnterTransition();
@@ -180,9 +207,9 @@ public class ArticleListActivity extends ActionBarActivity implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        Adapter adapter = new Adapter(cursor);
-        adapter.setHasStableIds(true);
-        mRecyclerView.setAdapter(adapter);
+        mAdapter = new Adapter(cursor);
+        mAdapter.setHasStableIds(true);
+        mRecyclerView.setAdapter(mAdapter);
         int columnCount = getResources().getInteger(R.integer.list_column_count);
         StaggeredGridLayoutManager sglm =
                 new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
@@ -207,6 +234,27 @@ public class ArticleListActivity extends ActionBarActivity implements
             return mCursor.getLong(ArticleLoader.Query._ID);
         }
 
+        //
+        // reverse lookup (gives a position based on an ID...
+        //
+        public int findItemId(long itemid) {
+            //TODO - UGG - use same unoptimized code which is in original xyzreader (do query instead).
+            int origpos = mCursor.getPosition();
+            int foundpos = 0;
+
+            mCursor.moveToFirst();
+            // TODO: optimize - could do a query instead...
+            while (!mCursor.isAfterLast()) {
+                if (mCursor.getLong(ArticleLoader.Query._ID) == itemid) {
+                    foundpos = mCursor.getPosition();
+                    break;
+                }
+                mCursor.moveToNext();
+            }
+            mCursor.moveToPosition(origpos);
+            return foundpos;
+        }
+
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = getLayoutInflater().inflate(R.layout.list_item_article, parent, false);
@@ -222,10 +270,13 @@ public class ArticleListActivity extends ActionBarActivity implements
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             //late binding setting of transition name
-                            vh.thumbnailView.setTransitionName("test_transition");
+                            vh.thumbnailView.setTransitionName("xyztrans"+getItemId(vh.getAdapterPosition()));
                             //TODO
+                            //ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this,vh.thumbnailView,
+                            //        "test_transition");
                             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this,vh.thumbnailView,
-                                    "test_transition");
+                                    vh.thumbnailView.getTransitionName());
+
                             startActivity(intent, options.toBundle());
                         } else {
                             startActivity(intent);
@@ -251,6 +302,8 @@ public class ArticleListActivity extends ActionBarActivity implements
                     mCursor.getString(ArticleLoader.Query.THUMB_URL),
                     ImageLoaderHelper.getInstance(ArticleListActivity.this).getImageLoader());
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
+            holder.thumbnailView.setTransitionName("xyztrans"+mCursor.getLong(ArticleLoader.Query._ID));    //set transition name (unique per story)
+            holder.thumbnailView.setTag(mCursor.getLong(ArticleLoader.Query._ID));                          //record the ID this thumbnail represents
 
         }
 

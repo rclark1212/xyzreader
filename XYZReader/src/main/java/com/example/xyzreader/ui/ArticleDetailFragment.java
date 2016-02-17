@@ -7,8 +7,6 @@ import android.content.Loader;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -112,14 +110,15 @@ public class ArticleDetailFragment extends Fragment implements
             }
         });
 
+        //set transition name
+        //mPhotoView.setTransitionName("test_transition");
+        mPhotoView.setTransitionName("xyztrans"+mItemId);
+
         bindViews();
 
         if (mIsTransitioning) {
             //TODO
         }
-
-        //set transition name
-        mPhotoView.setTransitionName("test_transition");
 
         return mRootView;
     }
