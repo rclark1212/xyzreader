@@ -11,6 +11,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
@@ -117,7 +118,18 @@ public class ArticleDetailFragment extends Fragment implements
         bindViews();
 
         if (mIsTransitioning) {
-            //TODO
+            //TODO - fix fab button for pre-SDK23
+            //handle the FAB button pop here...
+            /*
+            final FloatingActionButton mFAB = (FloatingActionButton) mRootView.findViewById(R.id.share_fab);
+            getActivity().getWindow().getEnterTransition().addListener(new TransitionAdapter() {
+                @Override
+                public void onTransitionEnd(Transition transition) {
+                    mFAB.animate().alpha(1.0f);
+                    getActivity().getWindow().getEnterTransition().removeListener(this);
+                }
+            });
+            */
         }
 
         return mRootView;

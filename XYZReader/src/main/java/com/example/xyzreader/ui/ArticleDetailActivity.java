@@ -91,7 +91,7 @@ public class ArticleDetailActivity extends ActionBarActivity
 
         //add nice transition approach - use the zoomout method in android dev docs
         //TODO - disable for now as we try and get main->detail transitions working
-        //mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -152,7 +152,7 @@ public class ArticleDetailActivity extends ActionBarActivity
                 }
                 mCursor.moveToNext();
             }
-            mStartId = 0;
+            //mStartId = 0; don't reset startid. Breaks animations...
         }
     }
 

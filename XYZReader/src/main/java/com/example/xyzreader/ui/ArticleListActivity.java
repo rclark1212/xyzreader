@@ -164,11 +164,7 @@ public class ArticleListActivity extends ActionBarActivity implements
         if (startingId != currentId) {
             //scroll to currentId - note, convert the ID to position...
             int position = mAdapter.findItemId(currentId);
-            //if you are on the first row, need to collapse title bar (app bar hides return image)
-            if (position < 2) {     //TODO - fix this magic number (first row or not?)
-                mToolbar.setExpanded(false);
-            }
-            mRecyclerView.scrollToPosition(mAdapter.findItemId(currentId));
+            mRecyclerView.scrollToPosition(position);
 
         }
 

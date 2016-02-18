@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
     android:transitionOrdering="together"
-    android:duration="1500">
+    android:duration="500">
+    <changeBounds/>
     <changeImageTransform/>
-    <!--
-    <fade xmlns:android="http://schemas.android.com/apk/res/android">
+    <slide android:slideEdge="top">
         <targets>
-            <target android:excludeId="@android:id/statusBarBackground"/>
-            <target android:excludeId="@android:id/navigationBarBackground"/>
+            <target android:targetId="@id/collapsing_toolbar_layout" />
+            <target android:targetId="@id/swipe_refresh_layout" />
         </targets>
-    </fade> -->
+    </slide>
+    <slide android:slideEdge="bottom">
+        <targets>
+            <target android:targetId="@id/meta_bar" />
+            <target android:targetId="@id/article_body" />
+            <target android:targetId="@id/share_fab" />
+        </targets>
+    </slide>
+
 </transitionSet>
