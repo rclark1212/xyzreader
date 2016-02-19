@@ -20,5 +20,6 @@ view of stories. Select a story and detail screen will show.
 
 Original xyzreader codebase
 https://github.com/alexjlockwood/activity-transitions - great example of transition with pager
+http://developer.android.com/training/animation/screen-slide.html - great example of pager transitions
 Udacity courses
 Previous projects for android nanodegree

@@ -1,0 +1,107 @@
+commit e8dc0ac6ecba26744bc539a94a6167d7f1207f52
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Thu Feb 18 19:28:26 2016 -0800
+
+    tweak a few margins, fix lack of network errors, add readme, implement FAB action, fix some text layout issues for R/L support
+
+commit dc2750b6f2c114f96ae0a0bf1cdbca08f6b8bd86
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Thu Feb 18 14:24:26 2016 -0800
+
+    cleanup - remove XYZReader/build dir (and add to .gitignore)
+
+commit 706101db0bf9bbc389549233a4eba4ce086e3c40
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Wed Feb 17 17:21:59 2016 -0800
+
+    finalize transitions for phone (known bugs fixed, transitions good aesthetic)
+
+commit 960505e63f1c6199fb46eb24c559372c1491a4af
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Tue Feb 16 20:01:38 2016 -0800
+
+    fix most of the transition bugs and fix up for page swipes on detail view. Still have work/bugs.
+
+commit 0c3c745e061c273c96ba9dcc1624ba03ed5d8031
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Mon Feb 15 19:55:54 2016 -0800
+
+    intermediate checkin of transition effect (still quite buggy).
+
+commit 82bb7f936202d6842d04813b3df0b73bca371a85
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Sat Feb 13 09:41:00 2016 -0800
+
+    fix parallax scrolling of image. Change imagescaling to centerCrop (more immersive).
+
+commit 765df99710e1a87bc32c88cabd6c0c38db2dbf6c
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Sat Feb 13 09:21:56 2016 -0800
+
+    update detail title color palette, fix some margins, R/L, xml descriptors.
+
+commit d9fae70b037ae1ec67c3311459e9fce5d7a3bbc6
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Thu Feb 11 19:01:00 2016 -0800
+
+    fix fonts, fix text hotlinks, fix R/L start/end (except where hardcoded as equal), add some control descriptions.
+
+commit 0abde7af31692f22ae8ccf51f50669c75ada582f
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Thu Feb 11 18:02:32 2016 -0800
+
+    delete unused classes.
+
+commit 753481360a8f500d54b17de358e0ab2b664d8c2c
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Thu Feb 11 17:57:54 2016 -0800
+
+    convert detail view to coordinatorlayout (and rip out a ton of code).
+
+commit 5bbeb5050bcbaead49fad649b7b74661ac8ea3a0
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Wed Feb 10 17:33:46 2016 -0800
+
+    do some minor cleanup.
+
+commit 5bc60739bc43ce14eff838e6f69dce42e5cd6be5
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Wed Feb 10 08:32:45 2016 -0800
+
+    remove unused code (from removing nav button).
+
+commit 18b8a7037ce8e181cf03e6751e13a013d9ff3281
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Tue Feb 9 18:43:41 2016 -0800
+
+    remove the app bar/nav bar on detail and fix layout issues for photo size.
+
+commit 0c7b77f21518edd66be33fe4f5be483fefef6277
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Tue Feb 9 18:11:36 2016 -0800
+
+    fix the refresh action on main screen. add transition effect for page swipes on detail.
+
+commit 00e0b264c07acee7ee3c62cc7d154b669fae1871
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Mon Feb 8 18:50:20 2016 -0800
+
+    add coordinator layout to selector screen.
+
+commit 6072045213dd7bc1c93623bd91f9c645743c210e
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Sun Feb 7 14:07:34 2016 -0800
+
+    do some basic color/theme fixes. change to fab button.
+
+commit 5325fe85adad012da4540b99dedbf92a18521755
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Sun Feb 7 13:56:17 2016 -0800
+
+    update to latest sdk. fixup build. checkin. no functional mods yet to original code/resources.
+
+commit 7426a0a4fb33c040be79106fe044f93fbb10ab7a
+Author: rclark1212 <rclark1212@gmail.com>
+Date:   Sun Feb 7 13:47:00 2016 -0800
+
+    check in initial download of xyzreader.

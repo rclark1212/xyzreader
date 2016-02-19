@@ -49,7 +49,7 @@ public class ArticleListActivity extends ActionBarActivity implements
     private boolean mIsRefreshing = false;
     private Adapter mAdapter;
 
-    public static boolean mbInternet = true;    //set to false to disable transitions
+    private static boolean mbInternet = true;    //set to false to disable transitions
 
     static final String EXTRA_STARTING_STORY_ID = "extra_starting_story_id";
     static final String EXTRA_CURRENT_STORY_ID = "extra_current_story_id";
@@ -322,7 +322,6 @@ public class ArticleListActivity extends ActionBarActivity implements
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
             holder.thumbnailView.setTransitionName(getString(R.string.transition)+mCursor.getLong(ArticleLoader.Query._ID));    //set transition name (unique per story)
             holder.thumbnailView.setTag(mCursor.getLong(ArticleLoader.Query._ID));                          //record the ID this thumbnail represents
-
         }
 
         @Override
@@ -340,8 +339,9 @@ public class ArticleListActivity extends ActionBarActivity implements
             super(view);
             thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
             //set error image here (in case of no network for example)...
-            thumbnailView.setErrorImageResId(R.drawable.ic_sync_problem_black);
-
+            if (!mbInternet) {
+                thumbnailView.setErrorImageResId(R.drawable.ic_sync_problem_black);
+            }
             titleView = (TextView) view.findViewById(R.id.article_title);
             subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
         }
