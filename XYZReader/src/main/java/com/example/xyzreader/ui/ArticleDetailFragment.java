@@ -7,6 +7,7 @@ import android.content.Loader;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ public class ArticleDetailFragment extends Fragment implements
     private Cursor mCursor;
     private long mItemId;
     private View mRootView;
+    private TextView mTitleView;
     private ImageView mPhotoView;
     private int mMutedColor = 0;
     private boolean mIsTransitioning = false;
@@ -101,35 +103,27 @@ public class ArticleDetailFragment extends Fragment implements
 
         mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
 
+        //Grab the title view
+        mTitleView = (TextView) mRootView.findViewById(R.id.article_title);
+
         mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
                         .setType("text/plain")
-                        .setText("Some sample text")
+                        .setText(mTitleView.getText())
                         .getIntent(), getString(R.string.action_share)));
             }
         });
 
         //set transition name
-        //mPhotoView.setTransitionName("test_transition");
-        mPhotoView.setTransitionName("xyztrans"+mItemId);
+        mPhotoView.setTransitionName(getString(R.string.transition)+mItemId);
 
         bindViews();
 
         if (mIsTransitioning) {
             //TODO - fix fab button for pre-SDK23
-            //handle the FAB button pop here...
-            /*
-            final FloatingActionButton mFAB = (FloatingActionButton) mRootView.findViewById(R.id.share_fab);
-            getActivity().getWindow().getEnterTransition().addListener(new TransitionAdapter() {
-                @Override
-                public void onTransitionEnd(Transition transition) {
-                    mFAB.animate().alpha(1.0f);
-                    getActivity().getWindow().getEnterTransition().removeListener(this);
-                }
-            });
-            */
+            //do any work here for transitions not done in xml...
         }
 
         return mRootView;
@@ -170,15 +164,15 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
-            bylineView.setText(Html.fromHtml(
+            ///fix string for localization
+            bylineView.setText(Html.fromHtml(String.format(getString(R.string.byline_format_color),
                     DateUtils.getRelativeTimeSpanString(
                             mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
                             System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-                            DateUtils.FORMAT_ABBREV_ALL).toString()
-                            + " by <font color='#ffffff'>"
-                            + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                            + "</font>"));
+                            DateUtils.FORMAT_ABBREV_ALL).toString(),
+                    mCursor.getString(ArticleLoader.Query.AUTHOR))));
             bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY)));
+
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
                         @Override
@@ -198,8 +192,10 @@ public class ArticleDetailFragment extends Fragment implements
 
                         @Override
                         public void onErrorResponse(VolleyError volleyError) {
-
-                        }
+                            //put up an error
+                            mPhotoView.setImageResource(R.drawable.ic_sync_problem_black);
+                            startPostponedEnterTransition();
+                       }
                     });
         } else {
             mRootView.setVisibility(View.GONE);

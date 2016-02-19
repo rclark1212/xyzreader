@@ -48,7 +48,7 @@ public class ArticleDetailActivity extends ActionBarActivity
             if (mIsReturning) {
                 ImageView sharedElement = mCurrentStoryFragment.getStoryImage();
                 if (sharedElement == null) {
-                    // If shared element is null, then it has been scrolled off screen and
+                    // (1) If shared element is null, then it has been scrolled off screen and
                     // no longer visible. In this case we cancel the shared element transition by
                     // removing the shared element from the shared elements map.
                     names.clear();

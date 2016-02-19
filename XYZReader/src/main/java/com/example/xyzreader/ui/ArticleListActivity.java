@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -16,14 +18,10 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
-import android.util.TypedValue;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.xyzreader.R;
@@ -51,6 +49,8 @@ public class ArticleListActivity extends ActionBarActivity implements
     private boolean mIsRefreshing = false;
     private Adapter mAdapter;
 
+    public static boolean mbInternet = true;    //set to false to disable transitions
+
     static final String EXTRA_STARTING_STORY_ID = "extra_starting_story_id";
     static final String EXTRA_CURRENT_STORY_ID = "extra_current_story_id";
 
@@ -70,7 +70,7 @@ public class ArticleListActivity extends ActionBarActivity implements
                     // If startingPosition != currentPosition the user must have swiped to a
                     // different page in the DetailsActivity. We must update the shared element
                     // so that the correct one falls into place.
-                    String newTransitionName = "xyztrans" + currentId;
+                    String newTransitionName = getResources().getString(R.string.transition) + currentId;
                     View newSharedElement = mRecyclerView.findViewWithTag(currentId);
                     if (newSharedElement != null) {
                         names.clear();
@@ -111,6 +111,9 @@ public class ArticleListActivity extends ActionBarActivity implements
 
         //unused view (and move to coordinatorlayout)
         //final View toolbarContainerView = findViewById(R.id.toolbar_container);
+
+        //Get internet state (used for shared element transition if no internet - see articledetailactivity)
+        mbInternet = isOnline();
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
 
@@ -196,6 +199,21 @@ public class ArticleListActivity extends ActionBarActivity implements
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
     }
 
+    //
+    //  Utility routine to check if we have internet connection. Check on start
+    //
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+
+        if (netInfo == null)
+            return false;
+
+        return netInfo.isConnected();
+    }
+
+
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return ArticleLoader.newAllArticlesInstance(this);
@@ -264,12 +282,16 @@ public class ArticleListActivity extends ActionBarActivity implements
                         //set up the base intent
                         Intent intent = new Intent(Intent.ACTION_VIEW, ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        //Okay - so there appears to be a bug in networkimageview...
+                        //If you are not connected to the internet and you set up an error image
+                        //(as I have done), then the shared element transition going back to the view
+                        //from the detail screen crashes. It looks as if this is due to networkimageview
+                        //not preserving the bitmap resource for the return path...
+                        //So, check if we are online here. And if not online, then disable
+                        //the sharedelementtransition.
+                        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && mbInternet) {
                             //late binding setting of transition name
-                            vh.thumbnailView.setTransitionName("xyztrans"+getItemId(vh.getAdapterPosition()));
-                            //TODO
-                            //ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this,vh.thumbnailView,
-                            //        "test_transition");
+                            vh.thumbnailView.setTransitionName(getString(R.string.transition)+getItemId(vh.getAdapterPosition()));
                             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this,vh.thumbnailView,
                                     vh.thumbnailView.getTransitionName());
 
@@ -287,18 +309,18 @@ public class ArticleListActivity extends ActionBarActivity implements
         public void onBindViewHolder(ViewHolder holder, int position) {
             mCursor.moveToPosition(position);
             holder.titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
-            holder.subtitleView.setText(
+            //fix string formatting (for localization)
+            holder.subtitleView.setText(String.format(getString(R.string.byline_format),
                     DateUtils.getRelativeTimeSpanString(
                             mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
                             System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-                            DateUtils.FORMAT_ABBREV_ALL).toString()
-                            + " by "
-                            + mCursor.getString(ArticleLoader.Query.AUTHOR));
+                            DateUtils.FORMAT_ABBREV_ALL).toString(),
+                            mCursor.getString(ArticleLoader.Query.AUTHOR)));
             holder.thumbnailView.setImageUrl(
                     mCursor.getString(ArticleLoader.Query.THUMB_URL),
                     ImageLoaderHelper.getInstance(ArticleListActivity.this).getImageLoader());
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
-            holder.thumbnailView.setTransitionName("xyztrans"+mCursor.getLong(ArticleLoader.Query._ID));    //set transition name (unique per story)
+            holder.thumbnailView.setTransitionName(getString(R.string.transition)+mCursor.getLong(ArticleLoader.Query._ID));    //set transition name (unique per story)
             holder.thumbnailView.setTag(mCursor.getLong(ArticleLoader.Query._ID));                          //record the ID this thumbnail represents
 
         }
@@ -317,6 +339,9 @@ public class ArticleListActivity extends ActionBarActivity implements
         public ViewHolder(View view) {
             super(view);
             thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
+            //set error image here (in case of no network for example)...
+            thumbnailView.setErrorImageResId(R.drawable.ic_sync_problem_black);
+
             titleView = (TextView) view.findViewById(R.id.article_title);
             subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
         }
