@@ -4,5 +4,11 @@
     android:duration="500">
     <changeBounds/>
     <changeImageTransform/>
-    <fade/>
+    <fade>
+        <targets>
+            <target android:excludeId="@android:id/statusBarBackground" />
+            <target android:excludeId="@android:id/navigationBarBackground" />
+            <target android:excludeId="@id/photo" />
+        </targets>
+    </fade>
 </transitionSet>

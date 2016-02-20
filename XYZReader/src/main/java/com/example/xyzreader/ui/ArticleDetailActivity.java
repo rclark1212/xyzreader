@@ -85,12 +85,13 @@ public class ArticleDetailActivity extends ActionBarActivity
         mPagerAdapter = new MyPagerAdapter(getFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mPagerAdapter);
+
+        //TODO - delete. Not using margins on page flips (or fixup to use margins)
         mPager.setPageMargin((int) TypedValue
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
         //add nice transition approach - use the zoomout method in android dev docs
-        //TODO - disable for now as we try and get main->detail transitions working
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -104,8 +105,8 @@ public class ArticleDetailActivity extends ActionBarActivity
                 if (mCursor != null) {
                     mCursor.moveToPosition(position);
                 }
+                //set the new selected ID
                 mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
-                //TODO - fix up for transitions
             }
         });
 
@@ -152,7 +153,7 @@ public class ArticleDetailActivity extends ActionBarActivity
                 }
                 mCursor.moveToNext();
             }
-            //mStartId = 0; don't reset startid. Breaks animations...
+            //mStartId = 0; don't reset startid. Breaks animations when returning (always clears the animation)
         }
     }
 

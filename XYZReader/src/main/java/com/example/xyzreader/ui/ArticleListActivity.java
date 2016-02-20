@@ -160,7 +160,7 @@ public class ArticleListActivity extends ActionBarActivity implements
     @Override
     public void onActivityReenter(int requestCode, Intent data) {
         super.onActivityReenter(requestCode, data);
-        //Get bundle from detail activity (pass back parameters on what the currently selected story might be) - TODO
+        //Get bundle from detail activity (pass back parameters on what the currently selected story might be)
         mReenterStateBundle = new Bundle(data.getExtras());
         long startingId = mReenterStateBundle.getLong(EXTRA_STARTING_STORY_ID);
         long currentId = mReenterStateBundle.getLong(EXTRA_CURRENT_STORY_ID);

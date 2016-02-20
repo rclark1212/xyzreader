@@ -4,12 +4,6 @@
     android:duration="500">
     <changeBounds/>
     <changeImageTransform/>
-    <slide android:slideEdge="top">
-        <targets>
-            <target android:targetId="@id/collapsing_toolbar_layout" />
-            <target android:targetId="@id/swipe_refresh_layout" />
-        </targets>
-    </slide>
     <slide android:slideEdge="bottom">
         <targets>
             <target android:targetId="@id/meta_bar" />

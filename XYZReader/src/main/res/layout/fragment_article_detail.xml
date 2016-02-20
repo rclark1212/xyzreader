@@ -45,6 +45,17 @@
                     android:textColor="#8fff" />
             </LinearLayout>
 
+            <!-- fix a nasty transition bug with nexus5. It turns out that assigning an autolink:web
+                property to a text view causes a fade transition on that text view to fail for some devices
+                with a deadobject. Behavioral observations:
+                nexus9, nexus6 worked fine with autolink on view below and fade enabled
+                nexus5 failed with a deadobject
+                reviewed sharedelement structures in both cases - they matched
+                if you disabled fade transition on body text (exclude in transition resource), runs fine on n5
+                if you remove autolink on control (and enabled fade), runs fine on n5
+                Theory is there is a timing/race condition present with n5 on M (tested with M).
+       
+            -->
             <TextView
                 android:id="@+id/article_body"
                 style="?android:attr/textAppearanceMedium"
@@ -53,10 +64,9 @@
                 android:layout_marginStart="@dimen/detail_inner_horiz_margin"
                 android:layout_marginEnd="@dimen/detail_inner_horiz_margin"
                 android:paddingBottom="@dimen/detail_body_bottom_margin"
-                android:textColorLink="@color/theme_accent"
                 android:textSize="@dimen/detail_body_text_size"
-                android:autoLink="web"
                 android:lineSpacingMultiplier="@fraction/detail_body_line_spacing_multiplier" />
+
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 

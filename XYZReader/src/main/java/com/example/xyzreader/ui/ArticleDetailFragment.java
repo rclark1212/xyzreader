@@ -8,9 +8,11 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ShareCompat;
@@ -103,6 +105,9 @@ public class ArticleDetailFragment extends Fragment implements
 
         mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
 
+        //set transition name
+        mPhotoView.setTransitionName(getString(R.string.transition)+mItemId);
+
         //Grab the title view
         mTitleView = (TextView) mRootView.findViewById(R.id.article_title);
 
@@ -116,14 +121,10 @@ public class ArticleDetailFragment extends Fragment implements
             }
         });
 
-        //set transition name
-        mPhotoView.setTransitionName(getString(R.string.transition)+mItemId);
-
         bindViews();
 
         if (mIsTransitioning) {
-            //TODO - fix fab button for pre-SDK23
-            //do any work here for transitions not done in xml...
+            //TODO do any work here for transitions not done in xml...
         }
 
         return mRootView;
@@ -131,8 +132,7 @@ public class ArticleDetailFragment extends Fragment implements
 
     //Do transition here
     private void startPostponedEnterTransition() {
-        //Check if this is a page view change first...
-        //TODO
+        //TODO - Check if this is a page view change first...
         mPhotoView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
@@ -145,7 +145,18 @@ public class ArticleDetailFragment extends Fragment implements
 
     @Nullable
     ImageView getStoryImage() {
-        return mPhotoView;
+        //urp - need to check that image is visible...
+        if (isViewInBounds(getActivity().getWindow().getDecorView(), mPhotoView)) {
+            return mPhotoView;
+        }
+        return null;
+    }
+
+    //Check that view is in bounds of the provided container...
+    private static boolean isViewInBounds(@NonNull View container, @NonNull View view) {
+        Rect containerBounds = new Rect();
+        container.getHitRect(containerBounds);
+        return view.getLocalVisibleRect(containerBounds);
     }
 
     private void bindViews() {
@@ -157,6 +168,7 @@ public class ArticleDetailFragment extends Fragment implements
         TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
         bylineView.setMovementMethod(new LinkMovementMethod());
         TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
+        //TODO - fix the font...
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
         if (mCursor != null) {
@@ -164,7 +176,7 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
-            ///fix string for localization
+            //fix string for localization
             bylineView.setText(Html.fromHtml(String.format(getString(R.string.byline_format_color),
                     DateUtils.getRelativeTimeSpanString(
                             mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
