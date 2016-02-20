@@ -282,14 +282,7 @@ public class ArticleListActivity extends ActionBarActivity implements
                         //set up the base intent
                         Intent intent = new Intent(Intent.ACTION_VIEW, ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
 
-                        //Okay - so there appears to be a bug in networkimageview...
-                        //If you are not connected to the internet and you set up an error image
-                        //(as I have done), then the shared element transition going back to the view
-                        //from the detail screen crashes. It looks as if this is due to networkimageview
-                        //not preserving the bitmap resource for the return path...
-                        //So, check if we are online here. And if not online, then disable
-                        //the sharedelementtransition.
-                        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && mbInternet) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             //late binding setting of transition name
                             vh.thumbnailView.setTransitionName(getString(R.string.transition)+getItemId(vh.getAdapterPosition()));
                             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this,vh.thumbnailView,

@@ -54,7 +54,7 @@
                 if you disabled fade transition on body text (exclude in transition resource), runs fine on n5
                 if you remove autolink on control (and enabled fade), runs fine on n5
                 Theory is there is a timing/race condition present with n5 on M (tested with M).
-       
+
             -->
             <TextView
                 android:id="@+id/article_body"
