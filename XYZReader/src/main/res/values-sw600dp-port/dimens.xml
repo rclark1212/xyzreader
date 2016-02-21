@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- when on big tablet (for example nexus9) in portrait mode, lets stretch the vertical a bit... -->
+    <dimen name="detail_cardview_height">750dp</dimen>
+</resources>

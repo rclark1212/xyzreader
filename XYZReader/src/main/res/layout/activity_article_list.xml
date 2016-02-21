@@ -30,7 +30,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
-                android:theme="@style/Toolbar"
+                android:theme="@style/ToolbarMain"
                 app:contentInsetStart="72dp"
                 android:contentDescription="@string/app_name"
                 app:layout_collapseMode="pin" />

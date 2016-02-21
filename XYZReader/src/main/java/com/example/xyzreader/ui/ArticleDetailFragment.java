@@ -54,7 +54,6 @@ public class ArticleDetailFragment extends Fragment implements
     private ImageView mPhotoView;
     private int mMutedColor = 0;
     private boolean mIsTransitioning = false;
-    private boolean mIsCard;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -80,8 +79,6 @@ public class ArticleDetailFragment extends Fragment implements
         }
 
         mIsTransitioning = (savedInstanceState == null);
-
-        mIsCard = getResources().getBoolean(R.bool.detail_is_card);
 
         setHasOptionsMenu(true);
     }

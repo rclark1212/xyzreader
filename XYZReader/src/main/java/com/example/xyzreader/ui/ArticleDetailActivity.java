@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,7 @@ public class ArticleDetailActivity extends ActionBarActivity
     private MyPagerAdapter mPagerAdapter;
     private boolean mIsReturning = false;
     private ArticleDetailFragment mCurrentStoryFragment = null;
+    private boolean mIsCard = false;
 
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
@@ -93,6 +95,27 @@ public class ArticleDetailActivity extends ActionBarActivity
 
         //add nice transition approach - use the zoomout method in android dev docs
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+
+        //Check if this is cardview...
+        mIsCard = getResources().getBoolean(R.bool.detail_is_card);
+
+        //and if so, set toolbar to support action bar and add up button
+        if (mIsCard) {
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_cardview);
+            if (toolbar != null) {
+                setSupportActionBar(toolbar);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                //Default back button processing does not appear to follow same code path as back button
+                //pressed (likely because we added the view to the activity parent container instead of
+                //fragment. So just force toolbar back button to do a back event...
+                toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onBackPressed();
+                    }
+                });
+            }
+        }
 
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override

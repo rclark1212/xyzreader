@@ -2,5 +2,7 @@
     <!-- detail -->
     <dimen name="detail_title_text_size">36sp</dimen>
     <dimen name="detail_body_text_size">20sp</dimen>
+    <dimen name="detail_cardview_width">500dp</dimen>
+    <dimen name="detail_cardview_height">600dp</dimen>
     <item name="detail_body_line_spacing_multiplier" format="float" type="fraction">1.25</item>
 </resources>
