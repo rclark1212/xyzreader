@@ -16,8 +16,13 @@
     <!-- note - could just delete the dimen constants and use defaults but will leave the ones already defined -->
     <!-- other dims -->
     <dimen name="toolbar_icon_start_margin">16dp</dimen>
+    <dimen name="fab_margin">24dp</dimen>
+
+    <!-- elevations -->
+    <dimen name="selected_card_elevation">8dp</dimen>
     <dimen name="fab_elevation">6dp</dimen>
     <dimen name="fab_press_translation_z">12dp</dimen>
-    <dimen name="fab_margin">24dp</dimen>
+    <dimen name="toolbar_elevation">4dp</dimen>
+    <dimen name="resting_card_elevation">2dp</dimen>
 
 </resources>

@@ -10,6 +10,7 @@
     android:layout_marginBottom="@dimen/list_card_margin"
     android:clickable="true"
     android:focusable="true"
+    android:elevation="@dimen/resting_card_elevation"
     android:foreground="?selectableItemBackground">
 
     <LinearLayout

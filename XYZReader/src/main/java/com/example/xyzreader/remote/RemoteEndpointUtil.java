@@ -55,6 +55,8 @@ public class RemoteEndpointUtil {
         InputStream in = null;
 
         try {
+            //Fix this to use newer OkHttpClient (v2.7) based on udacity class notes.
+            //(was seeing crashes on pre-SDK level 21 OS)
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
                     .url(url)
