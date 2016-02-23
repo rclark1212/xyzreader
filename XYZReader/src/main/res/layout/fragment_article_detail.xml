@@ -20,7 +20,9 @@
                 android:layout_gravity="bottom"
                 android:orientation="vertical"
                 android:paddingStart="@dimen/detail_inner_horiz_margin"
+                android:paddingLeft="@dimen/detail_inner_horiz_margin"
                 android:paddingEnd="@dimen/detail_inner_horiz_margin"
+                android:paddingRight="@dimen/detail_inner_horiz_margin"
                 android:paddingTop="@dimen/detail_metabar_vert_padding"
                 android:paddingBottom="@dimen/detail_metabar_vert_padding"
                 android:layout_marginBottom="@dimen/detail_metabar_vert_padding">
@@ -62,7 +64,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/detail_inner_horiz_margin"
+                android:layout_marginLeft="@dimen/detail_inner_horiz_margin"
                 android:layout_marginEnd="@dimen/detail_inner_horiz_margin"
+                android:layout_marginRight="@dimen/detail_inner_horiz_margin"
                 android:paddingBottom="@dimen/detail_body_bottom_margin"
                 android:textSize="@dimen/detail_body_text_size"
                 android:lineSpacingMultiplier="@fraction/detail_body_line_spacing_multiplier" />
