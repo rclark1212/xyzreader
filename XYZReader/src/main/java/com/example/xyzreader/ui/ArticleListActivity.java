@@ -1,5 +1,6 @@
 package com.example.xyzreader.ui;
 
+import android.annotation.TargetApi;
 import android.app.ActivityOptions;
 import android.app.LoaderManager;
 import android.app.SharedElementCallback;
@@ -59,43 +60,51 @@ public class ArticleListActivity extends ActionBarActivity implements
      */
 
     //Set a callback for shared element transition
-    private final SharedElementCallback mCallback = new SharedElementCallback() {
-        @Override
-        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-            if (mReenterStateBundle != null) {
-                //Check here if we are coming back to a different story than when we started. And fix up.
-                long startingId = mReenterStateBundle.getLong(EXTRA_STARTING_STORY_ID);
-                long currentId = mReenterStateBundle.getLong(EXTRA_CURRENT_STORY_ID);
-                if (startingId != currentId) {
-                    // If startingPosition != currentPosition the user must have swiped to a
-                    // different page in the DetailsActivity. We must update the shared element
-                    // so that the correct one falls into place.
-                    String newTransitionName = getResources().getString(R.string.transition) + currentId;
-                    View newSharedElement = mRecyclerView.findViewWithTag(currentId);
-                    if (newSharedElement != null) {
-                        names.clear();
-                        names.add(newTransitionName);
-                        sharedElements.clear();
-                        sharedElements.put(newTransitionName, newSharedElement);
+    //TODO - verify taking out final is okay here
+    private SharedElementCallback mCallback = null;
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            mCallback = new SharedElementCallback() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                @Override
+                public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                    if (mReenterStateBundle != null) {
+                        //Check here if we are coming back to a different story than when we started. And fix up.
+                        long startingId = mReenterStateBundle.getLong(EXTRA_STARTING_STORY_ID);
+                        long currentId = mReenterStateBundle.getLong(EXTRA_CURRENT_STORY_ID);
+                        if (startingId != currentId) {
+                            // If startingPosition != currentPosition the user must have swiped to a
+                            // different page in the DetailsActivity. We must update the shared element
+                            // so that the correct one falls into place.
+                            String newTransitionName = getResources().getString(R.string.transition) + currentId;
+                            View newSharedElement = mRecyclerView.findViewWithTag(currentId);
+                            if (newSharedElement != null) {
+                                names.clear();
+                                names.add(newTransitionName);
+                                sharedElements.clear();
+                                sharedElements.put(newTransitionName, newSharedElement);
+                            }
+                        }
+
+                        mReenterStateBundle = null;
+                    } else {
+                        // If mReenterStateBundle is null, then the activity is exiting.
+                        View navigationBar = findViewById(android.R.id.navigationBarBackground);
+                        View statusBar = findViewById(android.R.id.statusBarBackground);
+                        if (navigationBar != null) {
+                            names.add(navigationBar.getTransitionName());
+                            sharedElements.put(navigationBar.getTransitionName(), navigationBar);
+                        }
+                        if (statusBar != null) {
+                            names.add(statusBar.getTransitionName());
+                            sharedElements.put(statusBar.getTransitionName(), statusBar);
+                        }
                     }
                 }
-
-                mReenterStateBundle = null;
-            } else {
-                // If mReenterStateBundle is null, then the activity is exiting.
-                View navigationBar = findViewById(android.R.id.navigationBarBackground);
-                View statusBar = findViewById(android.R.id.statusBarBackground);
-                if (navigationBar != null) {
-                    names.add(navigationBar.getTransitionName());
-                    sharedElements.put(navigationBar.getTransitionName(), navigationBar);
-                }
-                if (statusBar != null) {
-                    names.add(statusBar.getTransitionName());
-                    sharedElements.put(statusBar.getTransitionName(), statusBar);
-                }
-            }
+            };
         }
-    };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +112,9 @@ public class ArticleListActivity extends ActionBarActivity implements
         setContentView(R.layout.activity_article_list);
 
         //Set a shared element callback for the case where we may be exiting to a different element than we start from
-        setExitSharedElementCallback(mCallback);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setExitSharedElementCallback(mCallback);
+        }
 
         //Change toolbar global to the app bar (used later)
         mToolbar = (AppBarLayout) findViewById(R.id.app_bar_layout);
@@ -172,17 +183,20 @@ public class ArticleListActivity extends ActionBarActivity implements
         }
 
         //Hold off on any animation until we are ready to redraw view. Looks like a bug that Alex Lockwood worked around
-        postponeEnterTransition();
-        mRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-                // TODO: figure out why it is necessary to request layout here in order to get a smooth transition. (Per Alex Lockwood)
-                mRecyclerView.requestLayout();
-                startPostponedEnterTransition();
-                return true;
-            }
-        });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            postponeEnterTransition();
+
+            mRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    // TODO: figure out why it is necessary to request layout here in order to get a smooth transition. (Per Alex Lockwood)
+                    mRecyclerView.requestLayout();
+                    startPostponedEnterTransition();
+                    return true;
+                }
+            });
+        }
     }
 
     private BroadcastReceiver mRefreshingReceiver = new BroadcastReceiver() {
@@ -284,8 +298,8 @@ public class ArticleListActivity extends ActionBarActivity implements
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             //late binding setting of transition name
-                            vh.thumbnailView.setTransitionName(getString(R.string.transition)+getItemId(vh.getAdapterPosition()));
-                            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this,vh.thumbnailView,
+                            vh.thumbnailView.setTransitionName(getString(R.string.transition) + getItemId(vh.getAdapterPosition()));
+                            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this, vh.thumbnailView,
                                     vh.thumbnailView.getTransitionName());
 
                             startActivity(intent, options.toBundle());
@@ -313,7 +327,9 @@ public class ArticleListActivity extends ActionBarActivity implements
                     mCursor.getString(ArticleLoader.Query.THUMB_URL),
                     ImageLoaderHelper.getInstance(ArticleListActivity.this).getImageLoader());
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
-            holder.thumbnailView.setTransitionName(getString(R.string.transition)+mCursor.getLong(ArticleLoader.Query._ID));    //set transition name (unique per story)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                holder.thumbnailView.setTransitionName(getString(R.string.transition) + mCursor.getLong(ArticleLoader.Query._ID)); //set transition name (unique per story)
+            }
             holder.thumbnailView.setTag(mCursor.getLong(ArticleLoader.Query._ID));                          //record the ID this thumbnail represents
         }
 
@@ -332,7 +348,8 @@ public class ArticleListActivity extends ActionBarActivity implements
             super(view);
             thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
             //set error image here (in case of no network for example)...
-            if (!mbInternet) {
+            //and note that older (SDK16 at least) versions of android do not support vector gfx.
+            if ((!mbInternet) && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
                 thumbnailView.setErrorImageResId(R.drawable.ic_sync_problem_black);
             }
             titleView = (TextView) view.findViewById(R.id.article_title);

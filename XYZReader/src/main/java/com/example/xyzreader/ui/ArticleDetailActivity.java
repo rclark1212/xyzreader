@@ -1,5 +1,7 @@
 package com.example.xyzreader.ui;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
@@ -44,28 +46,37 @@ public class ArticleDetailActivity extends ActionBarActivity
     private ArticleDetailFragment mCurrentStoryFragment = null;
     private boolean mIsCard = false;
 
-    private final SharedElementCallback mCallback = new SharedElementCallback() {
-        @Override
-        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-            if (mIsReturning) {
-                ImageView sharedElement = mCurrentStoryFragment.getStoryImage();
-                if (sharedElement == null) {
-                    // (1) If shared element is null, then it has been scrolled off screen and
-                    // no longer visible. In this case we cancel the shared element transition by
-                    // removing the shared element from the shared elements map.
-                    names.clear();
-                    sharedElements.clear();
-                } else if (mStartId != mSelectedItemId) {
-                    //Check if user swiped to a different pager page. Need to remove old shared element
-                    //and replace it with new to use for transition
-                    names.clear();
-                    names.add(sharedElement.getTransitionName());
-                    sharedElements.clear();
-                    sharedElements.put(sharedElement.getTransitionName(), sharedElement);
+    //TODO - verify removing final is okay here...
+    private SharedElementCallback mCallback = null;
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mCallback = new SharedElementCallback() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                @Override
+                public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (mIsReturning) {
+                            ImageView sharedElement = mCurrentStoryFragment.getStoryImage();
+                            if (sharedElement == null) {
+                                // (1) If shared element is null, then it has been scrolled off screen and
+                                // no longer visible. In this case we cancel the shared element transition by
+                                // removing the shared element from the shared elements map.
+                                names.clear();
+                                sharedElements.clear();
+                            } else if (mStartId != mSelectedItemId) {
+                                //Check if user swiped to a different pager page. Need to remove old shared element
+                                //and replace it with new to use for transition
+                                names.clear();
+                                names.add(sharedElement.getTransitionName());
+                                sharedElements.clear();
+                                sharedElements.put(sharedElement.getTransitionName(), sharedElement);
+                            }
+                        }
+                    }
                 }
-            }
+            };
         }
-    };
+    }
 
 
     @Override
@@ -79,8 +90,11 @@ public class ArticleDetailActivity extends ActionBarActivity
         setContentView(R.layout.activity_article_detail);
 
         //Postpone transition until ready and set up callback
-        postponeEnterTransition();
-        setEnterSharedElementCallback(mCallback);
+        //But only for L or later...
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            postponeEnterTransition();
+            setEnterSharedElementCallback(mCallback);
+        }
 
         getLoaderManager().initLoader(0, null, this);
 
@@ -94,7 +108,9 @@ public class ArticleDetailActivity extends ActionBarActivity
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
         //add nice transition approach - use the zoomout method in android dev docs
-        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        }
 
         //Check if this is cardview...
         mIsCard = getResources().getBoolean(R.bool.detail_is_card);

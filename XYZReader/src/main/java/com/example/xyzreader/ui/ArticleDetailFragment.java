@@ -1,5 +1,6 @@
 package com.example.xyzreader.ui;
 
+import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -107,7 +109,9 @@ public class ArticleDetailFragment extends Fragment implements
         mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
 
         //set transition name
-        mPhotoView.setTransitionName(getString(R.string.transition)+mItemId);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mPhotoView.setTransitionName(getString(R.string.transition) + mItemId);
+        }
 
         //Grab the title view
         mTitleView = (TextView) mRootView.findViewById(R.id.article_title);
@@ -132,16 +136,19 @@ public class ArticleDetailFragment extends Fragment implements
     }
 
     //Do transition here
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void startPostponedEnterTransition() {
         //TODO - Check if this is a page view change first...
-        mPhotoView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                mPhotoView.getViewTreeObserver().removeOnPreDrawListener(this);
-                getActivity().startPostponedEnterTransition();
-                return true;
-            }
-        });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mPhotoView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    mPhotoView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    getActivity().startPostponedEnterTransition();
+                    return true;
+                }
+            });
+        }
     }
 
     @Nullable
@@ -206,7 +213,10 @@ public class ArticleDetailFragment extends Fragment implements
                         @Override
                         public void onErrorResponse(VolleyError volleyError) {
                             //put up an error
-                            mPhotoView.setImageResource(R.drawable.ic_sync_problem_black);
+                            //note that vector gfx not supported by older (SDK16) android. Put in an L check to be safe...
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                mPhotoView.setImageResource(R.drawable.ic_sync_problem_black);
+                            }
                             startPostponedEnterTransition();
                        }
                     });
