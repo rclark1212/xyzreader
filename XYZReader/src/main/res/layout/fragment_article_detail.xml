@@ -49,8 +49,6 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <!-- remove the war. turns out this was related again to the httpok issue.
-                remove this comment next checkin. -->
             <TextView
                 android:id="@+id/article_body"
                 style="@style/TextAppearance.AppCompat.Body1"

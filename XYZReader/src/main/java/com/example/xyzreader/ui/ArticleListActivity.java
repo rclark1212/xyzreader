@@ -60,7 +60,6 @@ public class ArticleListActivity extends ActionBarActivity implements
      */
 
     //Set a callback for shared element transition
-    //TODO - verify taking out final is okay here
     private SharedElementCallback mCallback = null;
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

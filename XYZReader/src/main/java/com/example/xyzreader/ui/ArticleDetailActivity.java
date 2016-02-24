@@ -46,7 +46,6 @@ public class ArticleDetailActivity extends ActionBarActivity
     private ArticleDetailFragment mCurrentStoryFragment = null;
     private boolean mIsCard = false;
 
-    //TODO - verify removing final is okay here...
     private SharedElementCallback mCallback = null;
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
