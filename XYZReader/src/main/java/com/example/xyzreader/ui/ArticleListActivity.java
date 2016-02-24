@@ -121,7 +121,6 @@ public class ArticleListActivity extends ActionBarActivity implements
 
         //unused view (and move to coordinatorlayout)
         //final View toolbarContainerView = findViewById(R.id.toolbar_container);
-
         //Get internet state (used for shared element transition if no internet - see articledetailactivity)
         mbInternet = isOnline();
 
@@ -292,6 +291,14 @@ public class ArticleListActivity extends ActionBarActivity implements
                     //prevent double clicking
                     if (!mIsDetailsActivityStarted) {
                         mIsDetailsActivityStarted = true;
+
+                        if (!mbInternet) {
+                            //Get internet state (used for shared element transition if no internet - see articledetailactivity)
+                            //check it again here in case internet came back... (could do with a broadcast receiver but
+                            //also not high overhead to poll when user selects a story)...
+                            mbInternet = isOnline();
+                        }
+
                         //set up the base intent
                         Intent intent = new Intent(Intent.ACTION_VIEW, ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
 
