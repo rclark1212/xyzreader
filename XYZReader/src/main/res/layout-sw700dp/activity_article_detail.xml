@@ -18,8 +18,9 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:theme="@style/ToolbarDetail"
+            style="?android:attr/textAppearanceMedium"
             android:elevation="@dimen/toolbar_elevation"
-            app:contentInsetStart="72dp"
+            app:contentInsetStart="@dimen/toolbar_text_start_margin"
             android:contentDescription="@string/app_name"
             app:layout_collapseMode="pin" />
 

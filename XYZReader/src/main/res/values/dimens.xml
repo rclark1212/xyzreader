@@ -1,7 +1,7 @@
 <resources>
     <!-- detail dims -->
     <dimen name="detail_title_text_size">32sp</dimen>
-    <dimen name="detail_body_text_size">22sp</dimen>
+    <dimen name="detail_body_text_size">16sp</dimen>
     <item name="detail_body_line_spacing_multiplier" format="float" type="fraction">1.25</item>
 
     <!-- gridview dims -->
@@ -12,11 +12,15 @@
     <dimen name="list_item_padding">16dp</dimen>
     <dimen name="list_title_bottom_pad">4dp</dimen>
     <dimen name="list_card_margin">4dp</dimen>
+    <dimen name="thumbnail_size">100dp</dimen>
 
     <!-- note - could just delete the dimen constants and use defaults but will leave the ones already defined -->
     <!-- other dims -->
     <dimen name="toolbar_icon_start_margin">16dp</dimen>
+    <dimen name="toolbar_text_start_margin">72dp</dimen>
     <dimen name="fab_margin">24dp</dimen>
+    <!-- per material guidelines, white on dark text contrast ratios hard to read - give some alpha here -->
+    <item name="metabar_text_alpha" format="float" type="fraction">0.87</item>
 
     <!-- elevations -->
     <dimen name="selected_card_elevation">8dp</dimen>

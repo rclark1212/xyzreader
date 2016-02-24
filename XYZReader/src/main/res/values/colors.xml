@@ -23,4 +23,5 @@
     <color name="theme_primary_dark">#3F51B5</color>
     <color name="theme_accent">#FF4081</color>
     <color name="ltgray">#ffe0e0e0</color>
+    <color name="metabar_title">@android:color/white</color>
 </resources>

@@ -16,7 +16,7 @@
                 android:id="@+id/meta_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#333"
+                android:background="?colorPrimaryDark"
                 android:layout_gravity="bottom"
                 android:orientation="vertical"
                 android:paddingStart="@dimen/detail_inner_horiz_margin"
@@ -29,38 +29,31 @@
 
                 <TextView
                     android:id="@+id/article_title"
-                    style="?android:attr/textAppearanceLarge"
+                    style="@style/TextAppearance.AppCompat.Display2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/detail_metabar_title_bottom_padding"
-                    android:textColor="#fff"
                     android:textStyle="bold"
-                    android:textSize="@dimen/detail_title_text_size"
-                    android:lineSpacingMultiplier="0.9" />
+                    android:alpha="@fraction/metabar_text_alpha"
+                    android:textColor="@color/metabar_title"
+                    android:textSize="@dimen/detail_title_text_size" />
+                    <!-- android:lineSpacingMultiplier="0.9" /> -->
                     <!-- don't change font family - delete android:fontFamily="sans-serif-condensed" -->
 
                 <TextView
                     android:id="@+id/article_byline"
-                    style="?android:attr/textAppearanceSmall"
+                    style="@style/TextAppearance.AppCompat.Subhead.Inverse"
+                    android:textColor="@color/metabar_title"
+                    android:alpha="@fraction/metabar_text_alpha"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#8fff" />
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <!-- fix a nasty transition bug with nexus5. It turns out that assigning an autolink:web
-                property to a text view causes a fade transition on that text view to fail for some devices
-                with a deadobject. Behavioral observations:
-                nexus9, nexus6 worked fine with autolink on view below and fade enabled
-                nexus5 failed with a deadobject
-                reviewed sharedelement structures in both cases - they matched
-                if you disabled fade transition on body text (exclude in transition resource), runs fine on n5
-                if you remove autolink on control (and enabled fade), runs fine on n5
-                Theory is there is a timing/race condition present with n5 on M (tested with M).
-
-            -->
+            <!-- remove the war. turns out this was related again to the httpok issue.
+                remove this comment next checkin. -->
             <TextView
                 android:id="@+id/article_body"
-                style="?android:attr/textAppearanceMedium"
+                style="@style/TextAppearance.AppCompat.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="@dimen/detail_body_top_margin"
@@ -70,7 +63,11 @@
                 android:layout_marginRight="@dimen/detail_inner_horiz_margin"
                 android:paddingBottom="@dimen/detail_body_bottom_margin"
                 android:textSize="@dimen/detail_body_text_size"
+                android:autoLink="all"
                 android:lineSpacingMultiplier="@fraction/detail_body_line_spacing_multiplier" />
+            <!-- keeping the wider spacing. while material does not prohibit it, I notice that
+            most news apps (including google), space the lines wider on news stories for easier
+            reading -->
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
