@@ -9,5 +9,7 @@
     <dimen name="detail_body_bottom_margin">88dp</dimen>
     <!-- ugly lack of margins on nexus9 in portrait - make small margin here -->
     <dimen name="list_side_margin">16dp</dimen>
+    <dimen name="toolbar_icon_start_margin">16dp</dimen>
+
 
 </resources>

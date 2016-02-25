@@ -65,6 +65,8 @@ the original activity is destroyed along with the adapter. The code which scroll
 story you flipped to in detail view has a transition back to an on screen element uses the adapter to find the position.
 So, in this case (rotating detail view, flipping through some stories and pressing back), list view can't be scrolled
 back to the proper position. To fix, really need to change the viewtags from sql db ids to position ids. 
+- something funky on back from detail w/n9. Try sleeping device while detail up and going back. Or going to home
+screen and back. 
 
 ## Testing
 
