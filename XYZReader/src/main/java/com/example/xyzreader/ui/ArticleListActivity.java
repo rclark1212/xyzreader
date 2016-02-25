@@ -166,6 +166,7 @@ public class ArticleListActivity extends ActionBarActivity implements
         mIsDetailsActivityStarted = false;
     }
 
+    private static int mPosition;
     @Override
     public void onActivityReenter(int requestCode, Intent data) {
         super.onActivityReenter(requestCode, data);
@@ -173,11 +174,14 @@ public class ArticleListActivity extends ActionBarActivity implements
         mReenterStateBundle = new Bundle(data.getExtras());
         long startingId = mReenterStateBundle.getLong(EXTRA_STARTING_STORY_ID);
         long currentId = mReenterStateBundle.getLong(EXTRA_CURRENT_STORY_ID);
+        mPosition = -1;
         if (startingId != currentId) {
             //scroll to currentId - note, convert the ID to position...
-            int position = mAdapter.findItemId(currentId);
-            mRecyclerView.scrollToPosition(position);
-
+            if (mAdapter != null) {
+                mPosition = mAdapter.findItemId(currentId);
+            }
+            //don't scroll here. Scroll after refresh view...
+            //mRecyclerView.scrollToPosition(position);
         }
 
         //Hold off on any animation until we are ready to redraw view. Looks like a bug that Alex Lockwood worked around
@@ -190,10 +194,17 @@ public class ArticleListActivity extends ActionBarActivity implements
                     mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
                     // TODO: figure out why it is necessary to request layout here in order to get a smooth transition. (Per Alex Lockwood)
                     mRecyclerView.requestLayout();
+                    if (mPosition >= 0) {
+                        mRecyclerView.scrollToPosition(mPosition);
+                    }
                     startPostponedEnterTransition();
                     return true;
                 }
             });
+        }
+
+        if (mPosition >= 0) {
+            mRecyclerView.scrollToPosition(mPosition);
         }
     }
 
@@ -328,7 +339,7 @@ public class ArticleListActivity extends ActionBarActivity implements
                             mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
                             System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
                             DateUtils.FORMAT_ABBREV_ALL).toString(),
-                            mCursor.getString(ArticleLoader.Query.AUTHOR)));
+                    mCursor.getString(ArticleLoader.Query.AUTHOR)));
             holder.thumbnailView.setImageUrl(
                     mCursor.getString(ArticleLoader.Query.THUMB_URL),
                     ImageLoaderHelper.getInstance(ArticleListActivity.this).getImageLoader());

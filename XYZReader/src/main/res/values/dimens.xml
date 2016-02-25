@@ -16,7 +16,6 @@
 
     <!-- note - could just delete the dimen constants and use defaults but will leave the ones already defined -->
     <!-- other dims -->
-    <dimen name="toolbar_icon_start_margin">16dp</dimen>
     <dimen name="toolbar_text_start_margin">72dp</dimen>
     <dimen name="fab_margin">24dp</dimen>
     <!-- per material guidelines, white on dark text contrast ratios hard to read - give some alpha here -->

@@ -138,7 +138,6 @@ public class ArticleDetailFragment extends Fragment implements
     //Do transition here
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void startPostponedEnterTransition() {
-        //TODO - Check if this is a page view change first...
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mPhotoView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
@@ -202,7 +201,7 @@ public class ArticleDetailFragment extends Fragment implements
                                 //Start transition once bitmap is loaded
                                 Palette p = Palette.generate(bitmap, 12);
                                 //default to dark theme color if no good color from palette
-                                mMutedColor = p.getDarkVibrantColor( ContextCompat.getColor(getActivity(), R.color.theme_primary_dark) );
+                                mMutedColor = p.getDarkVibrantColor( getResources().getColor(R.color.theme_primary_dark) );
                                 mPhotoView.setImageBitmap(imageContainer.getBitmap());
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);

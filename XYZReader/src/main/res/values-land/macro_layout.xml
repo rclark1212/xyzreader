@@ -1,5 +1,10 @@
 <resources>
+    <!-- list -->
+    <dimen name="list_side_margin">12dp</dimen>
+    <dimen name="toolbar_icon_start_margin">12dp</dimen>
+
     <!-- detail -->
+    <!-- covers n4, n5 in landscape mode -->
     <dimen name="detail_photo_height">224dp</dimen>
-    <dimen name="detail_inner_horiz_margin">112dp</dimen>
+    <dimen name="detail_inner_horiz_margin">80dp</dimen>
 </resources>
