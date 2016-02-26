@@ -7,11 +7,11 @@
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
         <!-- update - re-enable background dim for following reasons:
             a) think it is a better aesthetic
             b) the cardview is modal and while not technically a dialog, has many of the same properties of a dialog
             c) while material design spec does not specifically address this case, there is precedence in the form of the nav tray which also dims background
             -->
-        <item name="android:backgroundDimEnabled">true</item>
     </style>
 </resources>

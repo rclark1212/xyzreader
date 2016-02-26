@@ -55,7 +55,7 @@
             android:scrollbarStyle="outsideOverlay"
             android:paddingLeft="@dimen/list_side_margin"
             android:paddingRight="@dimen/list_side_margin"
-            android:paddingBottom="@dimen/recycler_view_bottom_padding" />
+            android:paddingBottom="@dimen/list_side_margin" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </android.support.design.widget.CoordinatorLayout>

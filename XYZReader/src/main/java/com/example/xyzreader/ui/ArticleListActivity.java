@@ -52,9 +52,9 @@ public class ArticleListActivity extends ActionBarActivity implements
 
     private static boolean mbInternet = true;    //set to false to disable transitions
 
-    static final String EXTRA_STARTING_STORY_ID = "extra_starting_story_id";
-    static final String EXTRA_CURRENT_STORY_ID = "extra_current_story_id";
-
+    static final String EXTRA_STARTING_STORY_POS = "extra_starting_story_pos";
+    static final String EXTRA_CURRENT_STORY_POS = "extra_current_story_pos";
+    static final String EXTRA_VIEW_LIST_POSITION = "extra_view_position";
     /*
         Transition code based on Alex Lockwood's excellent activity-transitions sample on github
      */
@@ -70,14 +70,14 @@ public class ArticleListActivity extends ActionBarActivity implements
                 public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
                     if (mReenterStateBundle != null) {
                         //Check here if we are coming back to a different story than when we started. And fix up.
-                        long startingId = mReenterStateBundle.getLong(EXTRA_STARTING_STORY_ID);
-                        long currentId = mReenterStateBundle.getLong(EXTRA_CURRENT_STORY_ID);
-                        if (startingId != currentId) {
+                        int startingPos = mReenterStateBundle.getInt(EXTRA_STARTING_STORY_POS);
+                        int currentPos = mReenterStateBundle.getInt(EXTRA_CURRENT_STORY_POS);
+                        if (startingPos != currentPos) {
                             // If startingPosition != currentPosition the user must have swiped to a
                             // different page in the DetailsActivity. We must update the shared element
                             // so that the correct one falls into place.
-                            String newTransitionName = getResources().getString(R.string.transition) + currentId;
-                            View newSharedElement = mRecyclerView.findViewWithTag(currentId);
+                            String newTransitionName = getResources().getString(R.string.transition) + currentPos;
+                            View newSharedElement = mRecyclerView.findViewWithTag(currentPos);
                             if (newSharedElement != null) {
                                 names.clear();
                                 names.add(newTransitionName);
@@ -172,22 +172,31 @@ public class ArticleListActivity extends ActionBarActivity implements
         super.onActivityReenter(requestCode, data);
         //Get bundle from detail activity (pass back parameters on what the currently selected story might be)
         mReenterStateBundle = new Bundle(data.getExtras());
-        long startingId = mReenterStateBundle.getLong(EXTRA_STARTING_STORY_ID);
-        long currentId = mReenterStateBundle.getLong(EXTRA_CURRENT_STORY_ID);
+        int startingPos = mReenterStateBundle.getInt(EXTRA_STARTING_STORY_POS);
+        int currentPos = mReenterStateBundle.getInt(EXTRA_CURRENT_STORY_POS);
         mPosition = -1;
-        if (startingId != currentId) {
+        if (startingPos != currentPos) {
             //scroll to currentId - note, convert the ID to position...
-            if (mAdapter != null) {
-                mPosition = mAdapter.findItemId(currentId);
-            }
-            //don't scroll here. Scroll after refresh view...
-            //mRecyclerView.scrollToPosition(position);
+            mPosition = currentPos;
+            //scroll here (need to get the element visible for transitions to work)
+            mRecyclerView.scrollToPosition(mPosition);
         }
 
         //Hold off on any animation until we are ready to redraw view. Looks like a bug that Alex Lockwood worked around
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             postponeEnterTransition();
 
+            //FIXME - if you go to detail screen on tablet, then sleep/wake, then go back...
+            //you have a timing issue. This code gets executed but the onPreDraw never fires. =corruption.
+            //With nexus6 works fine. With n9 and not going to sleep, works fine. Only n9 and sleep...
+            //Denver???
+            //Test1 - disable all special styles - works...
+            //Test2 - disable dim/null cache hint - fails...
+            //Test3 - reversed test2. re-enable all, disable windowtranslucebt/transluctent background - works...
+            //Test4 - only disable windowtranslucent. works.
+            //Test5 - reverse above. Enable all but translucent background. Fails. We have a winner...
+            //android:windowIsTranslucent">true - now search for bugs on internet...
+            //verify that shared elements need to be enabled...
             mRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
@@ -195,15 +204,15 @@ public class ArticleListActivity extends ActionBarActivity implements
                     // TODO: figure out why it is necessary to request layout here in order to get a smooth transition. (Per Alex Lockwood)
                     mRecyclerView.requestLayout();
                     if (mPosition >= 0) {
+                        //And it turns out you need to scroll again to proper position after requesting layout.
                         mRecyclerView.scrollToPosition(mPosition);
                     }
                     startPostponedEnterTransition();
                     return true;
                 }
             });
-        }
-
-        if (mPosition >= 0) {
+        } else if (mPosition >= 0) {
+            //For pre-L devices
             mRecyclerView.scrollToPosition(mPosition);
         }
     }
@@ -271,26 +280,6 @@ public class ArticleListActivity extends ActionBarActivity implements
             return mCursor.getLong(ArticleLoader.Query._ID);
         }
 
-        //
-        // reverse lookup (gives a position based on an ID...
-        //
-        public int findItemId(long itemid) {
-            //TODO - UGG - use same unoptimized code which is in original xyzreader (do query instead).
-            int origpos = mCursor.getPosition();
-            int foundpos = 0;
-
-            mCursor.moveToFirst();
-            // TODO: optimize - could do a query instead...
-            while (!mCursor.isAfterLast()) {
-                if (mCursor.getLong(ArticleLoader.Query._ID) == itemid) {
-                    foundpos = mCursor.getPosition();
-                    break;
-                }
-                mCursor.moveToNext();
-            }
-            mCursor.moveToPosition(origpos);
-            return foundpos;
-        }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -313,9 +302,12 @@ public class ArticleListActivity extends ActionBarActivity implements
                         //set up the base intent
                         Intent intent = new Intent(Intent.ACTION_VIEW, ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
 
+                        //add the position here as well...
+                        intent.putExtra(EXTRA_VIEW_LIST_POSITION, vh.getAdapterPosition());
+
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             //late binding setting of transition name
-                            vh.thumbnailView.setTransitionName(getString(R.string.transition) + getItemId(vh.getAdapterPosition()));
+                            vh.thumbnailView.setTransitionName(getString(R.string.transition) + vh.getAdapterPosition());
                             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this, vh.thumbnailView,
                                     vh.thumbnailView.getTransitionName());
 
@@ -345,9 +337,9 @@ public class ArticleListActivity extends ActionBarActivity implements
                     ImageLoaderHelper.getInstance(ArticleListActivity.this).getImageLoader());
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                holder.thumbnailView.setTransitionName(getString(R.string.transition) + mCursor.getLong(ArticleLoader.Query._ID)); //set transition name (unique per story)
+                holder.thumbnailView.setTransitionName(getString(R.string.transition) + position); //set transition name (unique per story)
             }
-            holder.thumbnailView.setTag(mCursor.getLong(ArticleLoader.Query._ID));                          //record the ID this thumbnail represents
+            holder.thumbnailView.setTag(position);                          //record the ID this thumbnail represents
         }
 
         @Override

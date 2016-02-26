@@ -38,13 +38,15 @@ public class ArticleDetailActivity extends ActionBarActivity
     private Cursor mCursor;
     private long mStartId;              //indicates starting story
 
-    private long mSelectedItemId;       //indicates current story
+    private int mStartPos;              //indicates current position
+    private int mSelectedPos;           //indicates selected position
 
     private ViewPager mPager;
     private MyPagerAdapter mPagerAdapter;
     private boolean mIsReturning = false;
     private ArticleDetailFragment mCurrentStoryFragment = null;
     private boolean mIsCard = false;
+    private final String ISTATE_CURRENT_PAGE_POS = "istate_current_pos";
 
     private SharedElementCallback mCallback = null;
     {
@@ -62,7 +64,7 @@ public class ArticleDetailActivity extends ActionBarActivity
                                 // removing the shared element from the shared elements map.
                                 names.clear();
                                 sharedElements.clear();
-                            } else if (mStartId != mSelectedItemId) {
+                            } else if (mStartPos != mSelectedPos) {
                                 //Check if user swiped to a different pager page. Need to remove old shared element
                                 //and replace it with new to use for transition
                                 names.clear();
@@ -144,16 +146,22 @@ public class ArticleDetailActivity extends ActionBarActivity
                 if (mCursor != null) {
                     mCursor.moveToPosition(position);
                 }
-                //set the new selected ID
-                mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
+                //set the new selected position
+                mSelectedPos = position;
             }
         });
 
         if (savedInstanceState == null) {
             if (getIntent() != null && getIntent().getData() != null) {
+                //get starting position
+                mStartPos = getIntent().getIntExtra(ArticleListActivity.EXTRA_VIEW_LIST_POSITION, 0);
+                //get the url of the story
                 mStartId = ItemsContract.Items.getItemId(getIntent().getData());
-                mSelectedItemId = mStartId;
+                mSelectedPos = mStartPos;
             }
+        } else {
+            //in case of rotate/activity destroy, need to recover current page pos
+            mSelectedPos = savedInstanceState.getInt(ISTATE_CURRENT_PAGE_POS);
         }
     }
 
@@ -163,11 +171,18 @@ public class ArticleDetailActivity extends ActionBarActivity
         //Return data to mainactivity here (i.e. return back data allowing transition to be properly
         //set up to the right element)
         Intent data = new Intent();
-        data.putExtra(ArticleListActivity.EXTRA_STARTING_STORY_ID, mStartId);
-        data.putExtra(ArticleListActivity.EXTRA_CURRENT_STORY_ID, mSelectedItemId);
+        data.putExtra(ArticleListActivity.EXTRA_STARTING_STORY_POS, mStartPos);
+        data.putExtra(ArticleListActivity.EXTRA_CURRENT_STORY_POS, mSelectedPos);
         setResult(RESULT_OK, data);
 
         super.finishAfterTransition();
+    }
+
+    //Save the current position on activity destroy (rotate, etc)
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(ISTATE_CURRENT_PAGE_POS, mSelectedPos);
     }
 
     @Override
@@ -192,7 +207,7 @@ public class ArticleDetailActivity extends ActionBarActivity
                 }
                 mCursor.moveToNext();
             }
-            //mStartId = 0; don't reset startid. Breaks animations when returning (always clears the animation)
+            mStartId = 0;
         }
     }
 
@@ -260,7 +275,7 @@ public class ArticleDetailActivity extends ActionBarActivity
         @Override
         public Fragment getItem(int position) {
             mCursor.moveToPosition(position);
-            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID));
+            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID), position);
         }
 
         @Override

@@ -48,9 +48,11 @@ public class ArticleDetailFragment extends Fragment implements
     private static final String TAG = "ArticleDetailFragment";
 
     public static final String ARG_ITEM_ID = "item_id";
+    public static final String ARG_ITEM_POS = "item_pos";
 
     private Cursor mCursor;
     private long mItemId;
+    private int mPosition;
     private View mRootView;
     private TextView mTitleView;
     private ImageView mPhotoView;
@@ -64,9 +66,10 @@ public class ArticleDetailFragment extends Fragment implements
     public ArticleDetailFragment() {
     }
 
-    public static ArticleDetailFragment newInstance(long itemId) {
+    public static ArticleDetailFragment newInstance(long itemId, int position) {
         Bundle arguments = new Bundle();
         arguments.putLong(ARG_ITEM_ID, itemId);
+        arguments.putInt(ARG_ITEM_POS, position);
         ArticleDetailFragment fragment = new ArticleDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
@@ -78,6 +81,11 @@ public class ArticleDetailFragment extends Fragment implements
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mItemId = getArguments().getLong(ARG_ITEM_ID);
+        }
+
+        //Get the position
+        if (getArguments().containsKey(ARG_ITEM_POS)) {
+            mPosition = getArguments().getInt(ARG_ITEM_POS);
         }
 
         mIsTransitioning = (savedInstanceState == null);
@@ -110,7 +118,7 @@ public class ArticleDetailFragment extends Fragment implements
 
         //set transition name
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mPhotoView.setTransitionName(getString(R.string.transition) + mItemId);
+            mPhotoView.setTransitionName(getString(R.string.transition) + mPosition);
         }
 
         //Grab the title view
