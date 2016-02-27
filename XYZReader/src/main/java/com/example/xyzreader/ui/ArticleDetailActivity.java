@@ -57,8 +57,8 @@ public class ArticleDetailActivity extends ActionBarActivity
                 public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         if (mIsReturning) {
-                            ImageView sharedElement = mCurrentStoryFragment.getStoryImage();
-                            if (sharedElement == null) {
+                            ImageView sharedElementSrc = mCurrentStoryFragment.getStoryImage();
+                            if (sharedElementSrc == null) {
                                 // (1) If shared element is null, then it has been scrolled off screen and
                                 // no longer visible. In this case we cancel the shared element transition by
                                 // removing the shared element from the shared elements map.
@@ -68,9 +68,9 @@ public class ArticleDetailActivity extends ActionBarActivity
                                 //Check if user swiped to a different pager page. Need to remove old shared element
                                 //and replace it with new to use for transition
                                 names.clear();
-                                names.add(sharedElement.getTransitionName());
+                                names.add(sharedElementSrc.getTransitionName());
                                 sharedElements.clear();
-                                sharedElements.put(sharedElement.getTransitionName(), sharedElement);
+                                sharedElements.put(sharedElementSrc.getTransitionName(), sharedElementSrc);
                             }
                         }
                     }
@@ -162,6 +162,9 @@ public class ArticleDetailActivity extends ActionBarActivity
         } else {
             //in case of rotate/activity destroy, need to recover current page pos
             mSelectedPos = savedInstanceState.getInt(ISTATE_CURRENT_PAGE_POS);
+            if (getIntent() != null && getIntent().getData() != null) {
+                mStartPos = getIntent().getIntExtra(ArticleListActivity.EXTRA_VIEW_LIST_POSITION, 0);
+            }
         }
     }
 

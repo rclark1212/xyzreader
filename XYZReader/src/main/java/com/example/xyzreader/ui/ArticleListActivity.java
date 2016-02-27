@@ -49,6 +49,8 @@ public class ArticleListActivity extends ActionBarActivity implements
     private boolean mIsDetailsActivityStarted = false;
     private boolean mIsRefreshing = false;
     private Adapter mAdapter;
+    private boolean mPendingTransition = false;
+    private int mReturnPos = 0;
 
     private static boolean mbInternet = true;    //set to false to disable transitions
 
@@ -76,6 +78,10 @@ public class ArticleListActivity extends ActionBarActivity implements
                             // If startingPosition != currentPosition the user must have swiped to a
                             // different page in the DetailsActivity. We must update the shared element
                             // so that the correct one falls into place.
+                            // Also force this call for a mPendingTransition (occurs when calling activity
+                            // destroyed due to rotate on detail page). By time we get here, android
+                            // has deleted the transition we want to do since it did not find a valid
+                            // view with the transition name...
                             String newTransitionName = getResources().getString(R.string.transition) + currentPos;
                             View newSharedElement = mRecyclerView.findViewWithTag(currentPos);
                             if (newSharedElement != null) {
@@ -174,6 +180,7 @@ public class ArticleListActivity extends ActionBarActivity implements
         mReenterStateBundle = new Bundle(data.getExtras());
         int startingPos = mReenterStateBundle.getInt(EXTRA_STARTING_STORY_POS);
         int currentPos = mReenterStateBundle.getInt(EXTRA_CURRENT_STORY_POS);
+        mReturnPos = currentPos;    //save off the return position
         mPosition = -1;
         if (startingPos != currentPos) {
             //scroll to currentId - note, convert the ID to position...
@@ -182,7 +189,7 @@ public class ArticleListActivity extends ActionBarActivity implements
             mRecyclerView.scrollToPosition(mPosition);
         }
 
-        //Hold off on any animation until we are ready to redraw view. Looks like a bug that Alex Lockwood worked around
+        //Hold off on any animation until we are ready to redraw view.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             postponeEnterTransition();
 
@@ -202,15 +209,34 @@ public class ArticleListActivity extends ActionBarActivity implements
                 public boolean onPreDraw() {
                     mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
                     // TODO: figure out why it is necessary to request layout here in order to get a smooth transition. (Per Alex Lockwood)
+                    // Aha - figure it out... If activity is killed due to rotation, there are no image views
+                    // with a transition name to bind to (not until bind is called from the recycler adapter).
+                    // So, the transition which was set up is cleared since there is no corresponding image element
+                    // that has the required transition name in the recycler view.
+                    // Or, to put it simply, you have to bind the recycler views to populate the transition names
+                    // before you can let the transition go through. In the case of the album example,
+                    // requestLayout performed this forcing function. In the case of an adapter, it does not.
+                    // So, how to fix? Well, if mAdapter == null, we haven't yet bound. So set a pending
+                    // request for entering transition using a private bool. And take care of it at
+                    // the end of the loader callback...
                     mRecyclerView.requestLayout();
                     if (mPosition >= 0) {
                         //And it turns out you need to scroll again to proper position after requesting layout.
                         mRecyclerView.scrollToPosition(mPosition);
                     }
-                    startPostponedEnterTransition();
+
+                    if (mAdapter != null) {
+                        //ready to start the transition
+                        startPostponedEnterTransition();
+                    } else {
+                        //Ugg - no views bound yet. Postpone to after the views are bound.
+                        mPendingTransition = true;  //set a flag to do this at end of loader...
+                    }
+
                     return true;
                 }
             });
+
         } else if (mPosition >= 0) {
             //For pre-L devices
             mRecyclerView.scrollToPosition(mPosition);
@@ -340,6 +366,18 @@ public class ArticleListActivity extends ActionBarActivity implements
                 holder.thumbnailView.setTransitionName(getString(R.string.transition) + position); //set transition name (unique per story)
             }
             holder.thumbnailView.setTag(position);                          //record the ID this thumbnail represents
+
+        }
+
+        @Override
+        public void onViewAttachedToWindow(ViewHolder view) {
+            //Views are bound at this point. Can call transition code here.
+            if (mPendingTransition && (mReturnPos == view.getAdapterPosition()))  {
+                //okay, we have bound the view we need for the transition
+                startPostponedEnterTransition();
+
+                mPendingTransition = false;     //clear out any pending transition
+            }
         }
 
         @Override

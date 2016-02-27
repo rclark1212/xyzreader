@@ -58,13 +58,9 @@ to look outside the window to the nav bar to go back.
 
 ## Opens (TODOs)
 
-- The db queries very inneficient (not using query - instead walking the database). Could be improved.
+- The db queries very inneficient (not using query - instead walking the database). Could be improved. This though exists
+from original code and with small number of records, not really an issue.
 - A blurred image background might be better for the background when on large format devices on detail view (see above).
-- There is still a bug in the scrolling when coming back to main list view. When you enter the detail view and rotate, 
-the original activity is destroyed along with the adapter. The code which scrolls the list view so that whatever
-story you flipped to in detail view has a transition back to an on screen element uses the adapter to find the position.
-So, in this case (rotating detail view, flipping through some stories and pressing back), list view can't be scrolled
-back to the proper position. To fix, really need to change the viewtags from sql db ids to position ids. 
 - something funky on back from detail w/n9. Try sleeping device while detail up and going back. Or going to home
 screen and back. 
 
