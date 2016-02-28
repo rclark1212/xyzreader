@@ -193,17 +193,15 @@ public class ArticleListActivity extends ActionBarActivity implements
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             postponeEnterTransition();
 
-            //FIXME - if you go to detail screen on tablet, then sleep/wake, then go back...
-            //you have a timing issue. This code gets executed but the onPreDraw never fires. =corruption.
-            //With nexus6 works fine. With n9 and not going to sleep, works fine. Only n9 and sleep...
-            //Denver???
-            //Test1 - disable all special styles - works...
-            //Test2 - disable dim/null cache hint - fails...
-            //Test3 - reversed test2. re-enable all, disable windowtranslucebt/transluctent background - works...
-            //Test4 - only disable windowtranslucent. works.
-            //Test5 - reverse above. Enable all but translucent background. Fails. We have a winner...
-            //android:windowIsTranslucent">true - now search for bugs on internet...
-            //verify that shared elements need to be enabled...
+
+            //Check if this is cardview...
+            if (getResources().getBoolean(R.bool.detail_is_card)) {
+                //To fix tablet...
+                //Google appears to have optimized draw code if you have a transparent window on top of
+                //a view (they never call onPreDraw). Invalidate view to force below to trigger.
+                mRecyclerView.invalidate();
+            }
+
             mRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
@@ -219,18 +217,34 @@ public class ArticleListActivity extends ActionBarActivity implements
                     // So, how to fix? Well, if mAdapter == null, we haven't yet bound. So set a pending
                     // request for entering transition using a private bool. And take care of it at
                     // the end of the loader callback...
-                    mRecyclerView.requestLayout();
-                    if (mPosition >= 0) {
-                        //And it turns out you need to scroll again to proper position after requesting layout.
-                        mRecyclerView.scrollToPosition(mPosition);
-                    }
-
+                    //
+                    // And one bug here. If no adapter, no scrolling. And if view on on page, can't transition.
                     if (mAdapter != null) {
+                        mRecyclerView.requestLayout();
+                        if (mPosition >= 0) {
+                            //And it turns out you need to scroll again to proper position after requesting layout.
+                            mRecyclerView.scrollToPosition(mPosition);
+                        }
+
                         //ready to start the transition
                         startPostponedEnterTransition();
                     } else {
                         //Ugg - no views bound yet. Postpone to after the views are bound.
                         mPendingTransition = true;  //set a flag to do this at end of loader...
+
+                        //okay - this gets tricky. If view not on screen, we will never get called and transition gets stuck...
+                        //so, to fix, if mPosition not null, kick off thread to scroll to position
+                        if (mPosition >= 0) {
+                            //kick off async thread for scroll.
+                            mRecyclerView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mRecyclerView.scrollToPosition(mPosition);
+                                    mPosition = -1;
+                                }
+                            });
+                        }
+
                     }
 
                     return true;
@@ -372,11 +386,12 @@ public class ArticleListActivity extends ActionBarActivity implements
         @Override
         public void onViewAttachedToWindow(ViewHolder view) {
             //Views are bound at this point. Can call transition code here.
-            if (mPendingTransition && (mReturnPos == view.getAdapterPosition()))  {
-                //okay, we have bound the view we need for the transition
-                startPostponedEnterTransition();
-
-                mPendingTransition = false;     //clear out any pending transition
+            if (mPendingTransition) {
+                if (mReturnPos == view.getAdapterPosition()) {
+                    mPendingTransition = false;     //clear out any pending transition
+                    //okay, we have bound the view we need for the transition
+                    startPostponedEnterTransition();
+                }
             }
         }
 

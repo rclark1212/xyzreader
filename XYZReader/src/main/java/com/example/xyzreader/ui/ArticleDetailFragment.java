@@ -147,14 +147,16 @@ public class ArticleDetailFragment extends Fragment implements
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void startPostponedEnterTransition() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mPhotoView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    mPhotoView.getViewTreeObserver().removeOnPreDrawListener(this);
-                    getActivity().startPostponedEnterTransition();
-                    return true;
-                }
-            });
+            if (isAdded()) {
+                mPhotoView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        mPhotoView.getViewTreeObserver().removeOnPreDrawListener(this);
+                        getActivity().startPostponedEnterTransition();
+                        return true;
+                    }
+                });
+            }
         }
     }
 
@@ -205,11 +207,12 @@ public class ArticleDetailFragment extends Fragment implements
                         @Override
                         public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
                             Bitmap bitmap = imageContainer.getBitmap();
-                            if (bitmap != null) {
+                            //yikes - this can be an async call. Get resources might not be valid...
+                            if ((bitmap != null) && isAdded()) {
                                 //Start transition once bitmap is loaded
-                                Palette p = Palette.generate(bitmap, 12);
+                                Palette p = Palette.from(bitmap).generate();
                                 //default to dark theme color if no good color from palette
-                                mMutedColor = p.getDarkVibrantColor( getResources().getColor(R.color.theme_primary_dark) );
+                                mMutedColor = p.getDarkVibrantColor(getResources().getColor(R.color.theme_primary_dark));
                                 mPhotoView.setImageBitmap(imageContainer.getBitmap());
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);

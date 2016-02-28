@@ -61,8 +61,6 @@ to look outside the window to the nav bar to go back.
 - The db queries very inneficient (not using query - instead walking the database). Could be improved. This though exists
 from original code and with small number of records, not really an issue.
 - A blurred image background might be better for the background when on large format devices on detail view (see above).
-- something funky on back from detail w/n9. Try sleeping device while detail up and going back. Or going to home
-screen and back. 
 
 ## Testing
 
