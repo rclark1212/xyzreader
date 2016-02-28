@@ -1,5 +1,6 @@
 package com.example.xyzreader.ui;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityOptions;
 import android.app.LoaderManager;
@@ -70,6 +71,7 @@ public class ArticleListActivity extends ActionBarActivity implements
                 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                    //are we coming back from a detail view?
                     if (mReenterStateBundle != null) {
                         //Check here if we are coming back to a different story than when we started. And fix up.
                         int startingPos = mReenterStateBundle.getInt(EXTRA_STARTING_STORY_POS);
@@ -168,7 +170,7 @@ public class ArticleListActivity extends ActionBarActivity implements
         mIsDetailsActivityStarted = false;
     }
 
-    private static int mPosition;
+    private static int mPosition;           //used to indicate a required scroll position...
     @Override
     public void onActivityReenter(int requestCode, Intent data) {
         super.onActivityReenter(requestCode, data);
@@ -194,15 +196,16 @@ public class ArticleListActivity extends ActionBarActivity implements
             if (getResources().getBoolean(R.bool.detail_is_card)) {
                 //To fix tablet...
                 //Google appears to have optimized draw code if you have a transparent window on top of
-                //a view (they never call onPreDraw). Invalidate view to force below to trigger.
+                //a view (they never call onPreDraw). Invalidate view to force below onPreDraw to trigger.
                 mRecyclerView.invalidate();
             }
 
             mRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @SuppressLint("NewApi")
                 @Override
                 public boolean onPreDraw() {
                     mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-                    // TODO: figure out why it is necessary to request layout here in order to get a smooth transition. (Per Alex Lockwood)
+                    // Figure out why it is necessary to request layout here in order to get a smooth transition. (Per Alex Lockwood)
                     // Aha - figure it out... If activity is killed due to rotation, there are no image views
                     // with a transition name to bind to (not until bind is called from the recycler adapter).
                     // So, the transition which was set up is cleared since there is no corresponding image element
@@ -220,21 +223,27 @@ public class ArticleListActivity extends ActionBarActivity implements
                         if (mPosition >= 0) {
                             //And it turns out you need to scroll again to proper position after requesting layout.
                             mRecyclerView.scrollToPosition(mPosition);
+                            mPosition = -1;
                         }
 
                         //ready to start the transition
                         startPostponedEnterTransition();
                     } else {
                         //Ugg - no views bound yet. Postpone to after the views are bound.
+                        //This turned out to be the most difficult portion of the exercise. No good listener event
+                        //for when views are bound but before transitions are validated by android.
+                        //Do it on onViewAttachedToWindow callback. Set a semiphore trigger.
                         mPendingTransition = true;  //set a flag to do this at end of loader...
 
-                        //okay - this gets tricky. If view not on screen, we will never get called and transition gets stuck...
+                        //okay - this gets tricky. If view not on screen, we will never get called in
+                        //onViewAttachedToWindow and transition gets stuck...
                         //so, to fix, if mPosition not null, kick off thread to scroll to position
                         if (mPosition >= 0) {
-                            //kick off async thread for scroll.
+                            //kick off UI thread for scroll.
                             mRecyclerView.post(new Runnable() {
                                 @Override
                                 public void run() {
+                                    //And then do the scroll
                                     mRecyclerView.scrollToPosition(mPosition);
                                     mPosition = -1;
                                 }
@@ -382,6 +391,8 @@ public class ArticleListActivity extends ActionBarActivity implements
         @Override
         public void onViewAttachedToWindow(ViewHolder view) {
             //Views are bound at this point. Can call transition code here.
+            //This is for the case when activity killed in detail screen (i.e. rotation) and views not
+            //bound in activity reenter. We have to delay transition to when the view is bound. (this callback).
             //Note - don't worry about pre-SDK21 - mPendingTransition only set for L or higher...
             if (mPendingTransition) {
                 if (mReturnPos == view.getAdapterPosition()) {

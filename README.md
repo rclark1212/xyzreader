@@ -61,6 +61,11 @@ to look outside the window to the nav bar to go back.
 - The db queries very inneficient (not using query - instead walking the database). Could be improved. This though exists
 from original code and with small number of records, not really an issue.
 - A blurred image background might be better for the background when on large format devices on detail view (see above).
+- And there is still a intermittent issue with scrolling to the proper area of the recycler view when the main activity 
+has been killed and the user has paged through the detail view to bring them to a view which was not on original recycler
+view screen (i.e. open the first item detail, page to the last item, rotate screen, go back). You get an animation but
+often the animation will not go back to the proper recycler view element. Testing google apps, they also have this
+problem though. See below for more.
 
 ## Note on a troublesome area of the code
 
@@ -78,7 +83,10 @@ And in onViewAttachWindow, used the semaphore to call into the transition handle
 a better solution since virtually every app that implements shared transitions will run into it. (and if not handled,
 you simply won't get a transition after rotate - maybe that is what is commonly done?).
 
-
+One problem area that remains is scrolling to the proper position when recycler view has to scroll for this case. I think
+this is a common problem though. In testing google apps, google photos simply does not do a transition in this case 
+(where recycler view would have to scroll). For gmail, a transition is done but it also has the same scrolling issue
+that xyzreader has.
 ## Testing
 
 Tested on Nexus4 (emulator), N5, N6, N7, N9. Portrait and landscape.

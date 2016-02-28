@@ -12,7 +12,6 @@
     <string name="up">Up</string>
 
     <string name="byline_format" formatted="false">%s by %s</string>
-    <string name="byline_format_color" formatted="false">%s by <font color='#ffffff'>%s</font></string>
 
     <string name="transition" translatable="false">xyztrans</string>
 

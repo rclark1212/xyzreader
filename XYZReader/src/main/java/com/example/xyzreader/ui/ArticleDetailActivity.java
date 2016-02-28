@@ -84,7 +84,7 @@ public class ArticleDetailActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            //set an immersive view
+            //set an immersive view - full screen ahead!
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
                             View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
@@ -109,12 +109,12 @@ public class ArticleDetailActivity extends ActionBarActivity
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
-        //add nice transition approach - use the zoomout method in android dev docs
+        //add nice transition approach for page flips - use the zoomout method in android dev docs
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mPager.setPageTransformer(true, new ZoomOutPageTransformer());
         }
 
-        //Check if this is cardview...
+        //Check if this is cardview... (big tablet mode)
         mIsCard = getResources().getBoolean(R.bool.detail_is_card);
 
         //and if so, set toolbar to support action bar and add up button
@@ -122,16 +122,18 @@ public class ArticleDetailActivity extends ActionBarActivity
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_cardview);
             if (toolbar != null) {
                 setSupportActionBar(toolbar);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                //Default back button processing does not appear to follow same code path as back button
-                //pressed (likely because we added the view to the activity parent container instead of
-                //fragment. So just force toolbar back button to do a back event...
-                toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onBackPressed();
-                    }
-                });
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    //Default back button processing does not appear to follow same code path as back button
+                    //pressed (likely because we added the view to the activity parent container instead of
+                    //fragment. So just force toolbar back button to do a back event...
+                    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onBackPressed();
+                        }
+                    });
+                }
             }
         }
 

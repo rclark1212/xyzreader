@@ -138,6 +138,7 @@ public class ArticleDetailFragment extends Fragment implements
 
         if (mIsTransitioning) {
             //TODO do any work here for transitions not done in xml...
+            //None for now but leave this here in case we need it...
         }
 
         return mRootView;
@@ -147,6 +148,7 @@ public class ArticleDetailFragment extends Fragment implements
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void startPostponedEnterTransition() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //Make sure we are attached to an activity (can flip through pages fast and be detached)
             if (isAdded()) {
                 mPhotoView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                     @Override
@@ -185,7 +187,7 @@ public class ArticleDetailFragment extends Fragment implements
         TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
         bylineView.setMovementMethod(new LinkMovementMethod());
         TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
-        //Use default roboto
+        //Use default roboto - don't use this custom font
         //bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
         if (mCursor != null) {
@@ -194,7 +196,7 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.animate().alpha(1);
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             //fix string for localization
-            bylineView.setText(Html.fromHtml(String.format(getString(R.string.byline_format_color),
+            bylineView.setText(Html.fromHtml(String.format(getString(R.string.byline_format),
                     DateUtils.getRelativeTimeSpanString(
                             mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
                             System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
@@ -208,6 +210,7 @@ public class ArticleDetailFragment extends Fragment implements
                         public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
                             Bitmap bitmap = imageContainer.getBitmap();
                             //yikes - this can be an async call. Get resources might not be valid...
+                            //Make sure fragment attached to an activity
                             if ((bitmap != null) && isAdded()) {
                                 //Start transition once bitmap is loaded
                                 Palette p = Palette.from(bitmap).generate();
