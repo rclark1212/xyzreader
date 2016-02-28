@@ -62,6 +62,23 @@ to look outside the window to the nav bar to go back.
 from original code and with small number of records, not really an issue.
 - A blurred image background might be better for the background when on large format devices on detail view (see above).
 
+## Note on a troublesome area of the code
+
+Everything was straightforward except the case where the main activity is killed while you are on a detail screen (for
+example, if you rotated). The big problem was the transition going back. At the time activity reenter is called,
+none of the views are bound yet to recycler view. Thus any transition is killed.
+
+It was pretty painful correcting for this. Ideally there would be some single event/callback I could use to tell me
+when recycler view bindings were complete and I could then both scroll the view as necessary and call the transition
+code to execute.
+
+Could not find a good event. So instead, I checked in the preDraw listener to see if we had a bound adapter for
+recyclerview. If not, I set a semaphore and posted a runnable thread to scroll the view to the proper position.
+And in onViewAttachWindow, used the semaphore to call into the transition handler. This type of issue probably has 
+a better solution since virtually every app that implements shared transitions will run into it. (and if not handled,
+you simply won't get a transition after rotate - maybe that is what is commonly done?).
+
+
 ## Testing
 
 Tested on Nexus4 (emulator), N5, N6, N7, N9. Portrait and landscape.

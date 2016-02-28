@@ -78,10 +78,6 @@ public class ArticleListActivity extends ActionBarActivity implements
                             // If startingPosition != currentPosition the user must have swiped to a
                             // different page in the DetailsActivity. We must update the shared element
                             // so that the correct one falls into place.
-                            // Also force this call for a mPendingTransition (occurs when calling activity
-                            // destroyed due to rotate on detail page). By time we get here, android
-                            // has deleted the transition we want to do since it did not find a valid
-                            // view with the transition name...
                             String newTransitionName = getResources().getString(R.string.transition) + currentPos;
                             View newSharedElement = mRecyclerView.findViewWithTag(currentPos);
                             if (newSharedElement != null) {
@@ -386,6 +382,7 @@ public class ArticleListActivity extends ActionBarActivity implements
         @Override
         public void onViewAttachedToWindow(ViewHolder view) {
             //Views are bound at this point. Can call transition code here.
+            //Note - don't worry about pre-SDK21 - mPendingTransition only set for L or higher...
             if (mPendingTransition) {
                 if (mReturnPos == view.getAdapterPosition()) {
                     mPendingTransition = false;     //clear out any pending transition
