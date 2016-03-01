@@ -21,7 +21,7 @@
         <!--suppress AndroidLintContentDescription -->
         <com.example.xyzreader.ui.DynamicHeightNetworkImageView
             android:id="@+id/thumbnail"
-            android:layout_width="@dimen/thumbnail_size"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/thumbnail_size"
             android:layout_marginStart="@dimen/list_item_padding"
             android:layout_marginLeft="@dimen/list_item_padding"
